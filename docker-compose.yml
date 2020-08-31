@@ -1,0 +1,33 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    restart: always
+    ports: 
+      - 5432:5432
+    environment: 
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=data
+    tty: true
+    container_name: gocrm_db
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    links: 
+      - db
+    tty: true
+    container_name: gocrm_adminer
+  app:
+    build:
+      context: ./cmd/gocrm
+    volumes:
+      - "./:/go/src/github.com/demsasha4yt/gocrm"
+    container_name: gocrm_app
+    ports:
+      - "3000:3000"
+    tty: true
+    links:
+      - db

@@ -1,0 +1,4 @@
+CREATE TABLE access_levels (
+  id BIGSERIAL NOT NULL PRIMARY KEY,
+  name VARCHAR NOT NULL
+);
