@@ -16,6 +16,6 @@ VALUES
   ('Создание заказа', 2);
   
 INSERT INTO
-  users(login, password, email, first_name, last_name, third_name, access_level, unit_id)
+  users(login, password, email, first_name, last_name, third_name, access_level)
 VALUES
-  ('admin', '6UmH7d8hySh9Slxav0HHQij1JXF0yd+rKaXRRS6kBP/Eok3Nqy/FlwJQvrr8egwk/7gkK1u1B4nZdatPsCGHtw==', 'demsasha4yt@yandex.ru', 'Александр', 'Дементьев', 'Владимирович', 4, 1);
+  ('admin', 'zKgdNE7BHguhCKv+42U0WnRCbF8DgMJRQCi2aqzk3vMGfP0ZNIIes6SK+aE6cZtlVm4rEKfY4earvqcNGIMuSA==', 'demsasha4yt@yandex.ru', 'Александр', 'Дементьев', 'Владимирович', 4);

@@ -7,7 +7,6 @@ CREATE TABLE users (
   last_name VARCHAR(64),
   third_name VARCHAR(64),
   access_level BIGINT DEFAULT 0,
-  unit_id BIGINT DEFAULT 1,
   last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(login),
@@ -15,9 +14,5 @@ CREATE TABLE users (
   CONSTRAINT fk_access_levels
     FOREIGN KEY(access_level) 
       REFERENCES access_levels(id)
-      ON DELETE SET DEFAULT,
-  CONSTRAINT fk_units
-    FOREIGN KEY(unit_id)
-      REFERENCES units(id)
-      ON DELETE CASCADE
+      ON DELETE SET DEFAULT
 );

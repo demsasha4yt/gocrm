@@ -35,12 +35,17 @@ func (r *UserRepository) Create(u *models.User) error {
 func (r *UserRepository) Find(id int) (*models.User, error) {
 	u := &models.User{}
 	if err := r.store.db.QueryRow(
-		"SELECT id, email, password FROM users WHERE id = $1",
+		"SELECT id, login, password, email, first_name, last_name, third_name, access_level FROM users WHERE id = $1",
 		id,
 	).Scan(
 		&u.ID,
-		&u.Email,
+		&u.Login,
 		&u.EncryptedPassword,
+		&u.Email,
+		&u.FirstName,
+		&u.LastName,
+		&u.ThirdName,
+		&u.AccessLevel,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
@@ -56,12 +61,17 @@ func (r *UserRepository) Find(id int) (*models.User, error) {
 func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 	u := &models.User{}
 	if err := r.store.db.QueryRow(
-		"SELECT id, email, password FROM users WHERE email = $1",
+		"SELECT id, login, password, email, first_name, last_name, third_name, access_level FROM users WHERE email = $1",
 		email,
 	).Scan(
 		&u.ID,
-		&u.Email,
+		&u.Login,
 		&u.EncryptedPassword,
+		&u.Email,
+		&u.FirstName,
+		&u.LastName,
+		&u.ThirdName,
+		&u.AccessLevel,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
@@ -75,12 +85,17 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
 	u := &models.User{}
 	if err := r.store.db.QueryRow(
-		"SELECT id, login, password FROM users WHERE login = $1",
+		"SELECT id, login, password, email, first_name, last_name, third_name, access_level FROM users WHERE login = $1",
 		login,
 	).Scan(
 		&u.ID,
 		&u.Login,
 		&u.EncryptedPassword,
+		&u.Email,
+		&u.FirstName,
+		&u.LastName,
+		&u.ThirdName,
+		&u.AccessLevel,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
@@ -88,4 +103,62 @@ func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
 		return nil, err
 	}
 	return u, nil
+}
+
+// Delete deletes user
+func (r *UserRepository) Delete(id int) error {
+	_, err := r.store.db.Exec("DELETE FROM users WHERE id=$1", id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Update user
+func (r *UserRepository) Update(id int, u *models.User) error {
+	u.EncryptedPassword = "a" // to avoid validate passoword field
+	if err := u.Validate(); err != nil {
+		return err
+	}
+
+	userDetails, err := r.Find(id)
+	if err != nil {
+		return store.ErrRecordNotFound
+	}
+
+	if u.Login != "" {
+		userDetails.Login = u.Login
+	}
+	if u.Email != "" {
+		userDetails.Email = u.Email
+	}
+	if u.FirstName != "" {
+		userDetails.Email = u.FirstName
+	}
+	if u.LastName != "" {
+		userDetails.Email = u.LastName
+	}
+	if u.ThirdName != "" {
+		userDetails.Email = u.ThirdName
+	}
+	if u.AccessLevel != 0 {
+		userDetails.AccessLevel = u.AccessLevel
+	}
+
+	_, err = r.store.db.Exec(
+		"UPDATE users(login, password, email, first_name, last_name, third_name, access_level) VALUES($1 $2 $3 $4 $5 $7) WHERE id=$8",
+		&userDetails.Login,
+		&userDetails.EncryptedPassword,
+		&userDetails.Email,
+		&userDetails.FirstName,
+		&userDetails.LastName,
+		&userDetails.ThirdName,
+		&userDetails.AccessLevel,
+		&userDetails.ID,
+	)
+	if err != nil {
+		return err
+	}
+	u = userDetails
+	return nil
 }

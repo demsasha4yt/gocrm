@@ -1,10 +1,11 @@
 package gocrm
 
 import (
+	"context"
 	"database/sql"
-	"encoding/json"
 	"net/http"
 
+	"github.com/demsasha4yt/gocrm.git/internal/app/models"
 	"github.com/demsasha4yt/gocrm.git/internal/app/store"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -61,9 +62,9 @@ func (s *server) configureRouter() {
 	api := s.router.PathPrefix("/api").Subrouter()
 	api.Use(s.authMiddleware)
 	api.HandleFunc("/whoami", s.handleWhoAmI()).Methods("GET")
+	api.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
 
-	// Reg/Auth ...
-	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
+	// Auth ...
 	s.router.HandleFunc("/session", s.handleSessionCreate()).Methods("POST")
 
 	// Serve static files for SPA
@@ -71,13 +72,11 @@ func (s *server) configureRouter() {
 	s.router.PathPrefix("/").Handler(spa)
 }
 
-func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {
-	s.respond(w, r, code, map[string]string{"error": err.Error()})
-}
-
-func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
-	w.WriteHeader(code)
-	if data != nil {
-		json.NewEncoder(w).Encode(data)
+// checkUserAccessRights checks if user has accessright
+func (s *server) checkUserAccessRights(ctx context.Context, accessRight int) bool {
+	u, ok := ctx.Value(ctxKeyUser).(*models.User)
+	if !ok {
+		return false
 	}
+	return u.HasAccessRight(accessRight)
 }

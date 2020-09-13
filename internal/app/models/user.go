@@ -8,6 +8,19 @@ import (
 	"github.com/go-ozzo/ozzo-validation/is"
 )
 
+const (
+	// UserAccessGuest ...
+	UserAccessGuest int = iota
+	// UserAccessManager ...
+	UserAccessManager
+	// UserAccessDirector ...
+	UserAccessDirector
+	// UserAccessRRS ...
+	UserAccessRRS
+	// UserAccessAdmin ...
+	UserAccessAdmin
+)
+
 // User implements user
 type User struct {
 	ID                int    `json:"id,omitempty"`
@@ -74,22 +87,27 @@ func encryptString(password string) (string, error) {
  ** Checks for USER
  */
 
+// HasAccessRight check is user has accessRight level
+func (u *User) HasAccessRight(right int) bool {
+	return u.AccessLevel >= right
+}
+
 // IsManager check is user has manager access level
 func (u *User) IsManager() bool {
-	return u.AccessLevel > 1
+	return u.AccessLevel >= UserAccessManager
 }
 
 // IsDirector checks is user has Director access level
 func (u *User) IsDirector() bool {
-	return u.AccessLevel > 2
+	return u.AccessLevel >= UserAccessDirector
 }
 
 // IsRRS checks is user has RRS access level
 func (u *User) IsRRS() bool {
-	return u.AccessLevel > 4
+	return u.AccessLevel >= UserAccessRRS
 }
 
 // IsAdmin checks is user has admin access level
 func (u *User) IsAdmin() bool {
-	return u.AccessLevel > 3
+	return u.AccessLevel >= UserAccessAdmin
 }

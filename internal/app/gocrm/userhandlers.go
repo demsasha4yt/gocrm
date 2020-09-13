@@ -15,6 +15,7 @@ const (
 var (
 	errIncorectEmailOrPassword = errors.New("Неправильный логин или пароль")
 	errNotAuthorized           = errors.New("Вы не авторизованы")
+	errHasNoRights             = errors.New("Вы не можете этого сделать")
 )
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
@@ -24,6 +25,10 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		Password string `json:"password"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
+		if !s.checkUserAccessRights(r.Context(), models.UserAccessRRS) {
+			s.error(w, r, http.StatusUnauthorized, errHasNoRights)
+			return
+		}
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
@@ -43,38 +48,20 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleSessionCreate() http.HandlerFunc {
-	type request struct {
-		Login    string `json:"login"`
-		Password string `json:"password"`
-	}
+func (s *server) handleUsersUpdate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
+		if !s.checkUserAccessRights(r.Context(), models.UserAccessRRS) {
+			s.error(w, r, http.StatusUnauthorized, errHasNoRights)
 			return
 		}
-		u, err := s.store.User().FindByLogin(req.Login)
-		if err != nil || !u.ComparePassword(req.Password) {
-			s.error(w, r, http.StatusUnauthorized, errIncorectEmailOrPassword)
-			return
-		}
-		session, err := s.sessionStore.Get(r, sessionName)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-		session.Values["user_id"] = u.ID
-		if err := s.sessionStore.Save(r, w, session); err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-		s.respond(w, r, http.StatusOK, nil)
 	}
 }
 
-func (s *server) handleWhoAmI() http.HandlerFunc {
+func (s *server) handleUserDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.respond(w, r, http.StatusOK, r.Context().Value(ctxKeyUser).(*models.User))
+		if !s.checkUserAccessRights(r.Context(), models.UserAccessRRS) {
+			s.error(w, r, http.StatusUnauthorized, errHasNoRights)
+			return
+		}
 	}
 }

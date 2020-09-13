@@ -60,3 +60,19 @@ func TestUserRepository_FindByLogin(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, u2)
 }
+
+func TestUserRepository_Delete(t *testing.T) {
+	db, teardown := sqlstore.TestDB(t, databaseURL)
+	defer teardown()
+
+	s := sqlstore.New(db)
+	err := s.User().Delete(100)
+	assert.NoError(t, err)
+
+	u, _ := s.User().Find(100)
+	assert.Nil(t, u)
+}
+
+func TestUserRepository_Update(t *testing.T) {
+	// TODO...
+}
