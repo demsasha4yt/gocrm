@@ -12,6 +12,15 @@ type UserRepository struct {
 	store *Store
 }
 
+func findUnits(r *UserRepository, u *models.User) error {
+	units, err := r.store.Unit().FindUnitsByUserID(u.ID)
+	if err != nil {
+		return err
+	}
+	u.Units = units
+	return nil
+}
+
 // Create creates user
 func (r *UserRepository) Create(u *models.User) error {
 	if err := u.Validate(); err != nil {
@@ -50,10 +59,11 @@ func (r *UserRepository) Find(id int) (*models.User, error) {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
 		}
-
 		return nil, err
 	}
-
+	if err := findUnits(r, u); err != nil {
+		return nil, err
+	}
 	return u, nil
 }
 
@@ -78,6 +88,9 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 		}
 		return nil, err
 	}
+	if err := findUnits(r, u); err != nil {
+		return nil, err
+	}
 	return u, nil
 }
 
@@ -100,6 +113,9 @@ func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
 		}
+		return nil, err
+	}
+	if err := findUnits(r, u); err != nil {
 		return nil, err
 	}
 	return u, nil
@@ -133,28 +149,28 @@ func (r *UserRepository) Update(id int, u *models.User) error {
 		userDetails.Email = u.Email
 	}
 	if u.FirstName != "" {
-		userDetails.Email = u.FirstName
+		userDetails.FirstName = u.FirstName
 	}
 	if u.LastName != "" {
-		userDetails.Email = u.LastName
+		userDetails.LastName = u.LastName
 	}
 	if u.ThirdName != "" {
-		userDetails.Email = u.ThirdName
+		userDetails.ThirdName = u.ThirdName
 	}
 	if u.AccessLevel != 0 {
 		userDetails.AccessLevel = u.AccessLevel
 	}
 
 	_, err = r.store.db.Exec(
-		"UPDATE users(login, password, email, first_name, last_name, third_name, access_level) VALUES($1 $2 $3 $4 $5 $7) WHERE id=$8",
-		&userDetails.Login,
-		&userDetails.EncryptedPassword,
-		&userDetails.Email,
-		&userDetails.FirstName,
-		&userDetails.LastName,
-		&userDetails.ThirdName,
-		&userDetails.AccessLevel,
-		&userDetails.ID,
+		"UPDATE users SET(login, password, email, first_name, last_name, third_name, access_level) = ($1, $2, $3, $4, $5, $6, $7) WHERE id=$8",
+		userDetails.Login,
+		userDetails.EncryptedPassword,
+		userDetails.Email,
+		userDetails.FirstName,
+		userDetails.LastName,
+		userDetails.ThirdName,
+		userDetails.AccessLevel,
+		userDetails.ID,
 	)
 	if err != nil {
 		return err

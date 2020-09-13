@@ -74,5 +74,38 @@ func TestUserRepository_Delete(t *testing.T) {
 }
 
 func TestUserRepository_Update(t *testing.T) {
-	// TODO...
+	db, teardown := sqlstore.TestDB(t, databaseURL)
+	defer teardown("users")
+
+	s := sqlstore.New(db)
+	u := models.TestUser(t)
+
+	assert.NoError(t, s.User().Create(u))
+	assert.NotNil(t, u.ID)
+
+	newU := &models.User{
+		FirstName:   "Test1",
+		LastName:    "Test1",
+		ThirdName:   "Test1",
+		AccessLevel: 2,
+		Email:       "dd@yandex.ru",
+		Login:       "TestLogin",
+	}
+	assert.NoError(t, s.User().Update(u.ID, newU))
+	assert.Equal(t, newU.FirstName, "Test1")
+	assert.Equal(t, newU.LastName, "Test1")
+	assert.Equal(t, newU.ThirdName, "Test1")
+	assert.Equal(t, newU.AccessLevel, 2)
+	assert.Equal(t, newU.Login, "TestLogin")
+	assert.Equal(t, newU.Email, "dd@yandex.ru")
+
+	user, err := s.User().Find(u.ID)
+	assert.NoError(t, err)
+	assert.NotNil(t, u)
+	assert.Equal(t, user.FirstName, "Test1")
+	assert.Equal(t, user.LastName, "Test1")
+	assert.Equal(t, user.ThirdName, "Test1")
+	assert.Equal(t, user.AccessLevel, 2)
+	assert.Equal(t, user.Login, "TestLogin")
+	assert.Equal(t, user.Email, "dd@yandex.ru")
 }

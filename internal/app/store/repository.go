@@ -9,8 +9,14 @@ type UserRepository interface {
 	FindByEmail(string) (*models.User, error)
 	FindByLogin(string) (*models.User, error)
 	Delete(int) error
+	Update(int, *models.User) error
 }
 
 // UnitRepository interface
 type UnitRepository interface {
+	Create(*models.Unit) error
+	Find(int) (*models.Unit, error)
+	Delete(int) error
+	Update(int, *models.Unit) error
+	FindUnitsByUserID(int) ([]*models.Unit, error)
 }

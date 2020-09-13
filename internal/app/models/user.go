@@ -23,17 +23,18 @@ const (
 
 // User implements user
 type User struct {
-	ID                int    `json:"id,omitempty"`
-	Login             string `json:"login,omitempty"`
-	Password          string `json:"password,omitempty"`
-	EncryptedPassword string `json:"-"`
-	Email             string `json:"email,omitempty"`
-	FirstName         string `json:"first_name,omitempty"`
-	LastName          string `json:"last_name,omitempty"`
-	ThirdName         string `json:"third_name,omitempty"`
-	AccessLevel       int    `json:"access_level,omitempty"`
-	LastLogin         int    `json:"last_login,omitempty"`
-	CreatedAt         int    `json:"created_at,omitempty"`
+	ID                int         `json:"id,omitempty"`
+	Login             string      `json:"login,omitempty"`
+	Password          string      `json:"password,omitempty"`
+	EncryptedPassword string      `json:"-"`
+	Email             string      `json:"email,omitempty"`
+	FirstName         interface{} `json:"first_name,omitempty"`
+	LastName          interface{} `json:"last_name,omitempty"`
+	ThirdName         interface{} `json:"third_name,omitempty"`
+	AccessLevel       int         `json:"access_level,omitempty"`
+	LastLogin         int         `json:"last_login,omitempty"`
+	CreatedAt         int         `json:"created_at,omitempty"`
+	Units             []*Unit     `json:"units,omitempty"`
 }
 
 // Validate validates User structure

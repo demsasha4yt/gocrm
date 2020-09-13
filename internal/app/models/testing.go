@@ -12,3 +12,13 @@ func TestUser(t *testing.T) *User {
 		Password: "MyPassword",
 	}
 }
+
+// TestUnit ...
+func TestUnit(t *testing.T) *Unit {
+	t.Helper()
+
+	return &Unit{
+		Name:    "Test Unit",
+		Address: "Test Address",
+	}
+}
