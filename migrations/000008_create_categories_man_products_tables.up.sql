@@ -46,3 +46,17 @@ CREATE TABLE products (
 				REFERENCES manufacturers(id)
 					ON DELETE CASCADE
 );
+
+CREATE TABLE products_categories (
+	id BIGSERIAL PRIMARY KEY,
+	product_id BIGINT,
+	category_id BIGINT
+		CONSTRAINT fk_products
+			FOREIGN KEY(product_id)
+					REFERENCES products(id)
+						ON DELETE CASCADE,
+		CONSTRAINT fk_categories
+			FOREIGN KEY(category_id)
+					REFERENCES categories(id)
+						ON DELETE CASCADE
+)

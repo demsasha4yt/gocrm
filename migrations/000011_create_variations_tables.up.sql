@@ -2,20 +2,11 @@ CREATE TABLE variations (
 	id BIGSERIAL PRIMARY KEY,
 	name VARCHAR,
 	description VARCHAR,
-	price INT CONSTRAINT positive_price CHECK (price > 0)
-);
-
-CREATE TABLE products_variations (
-	id BIGSERIAL PRIMARY KEY,
-	product_id BIGINT,
-	variation_id BIGINT,
+	price INT CONSTRAINT positive_price CHECK (price > 0),
+	product_id BIGINT
 	CONSTRAINT fk_products
 		FOREIGN KEY(product_id)
 			REFERENCES products(id)
-				ON DELETE CASCADE,
-	CONSTRAINT fk_variations
-		FOREIGN KEY(variation_id)
-			REFERENCES variations(id)
 				ON DELETE CASCADE
 );
 
