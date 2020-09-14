@@ -1,9 +1,9 @@
 .PHONY: build
-build: 
+build:
 	go build -v ./cmd/gocrm
 
 .PHONY: test
-test: 
+test:
 	go test -v -race ./...
 
 .PHONY: migrate
@@ -16,6 +16,6 @@ migrate_down:
 
 .DEFAULT_GOAL := build
 
-# migrate create -ext sql -dir migrations -seq create_logs_users_table
+# migrate create -ext sql -dir migrations -seq create_customers_table
 # migrate -database "postgres://postgres:pass@db/data?sslmode=disable" -path migrations up
 # migrate -database "postgres://postgres:pass@db/data?sslmode=disable" -path migrations down
