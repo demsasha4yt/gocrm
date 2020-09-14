@@ -2,6 +2,8 @@ package sqlstore
 
 import (
 	"database/sql"
+	"encoding/json"
+	"fmt"
 
 	"github.com/demsasha4yt/gocrm.git/internal/app/models"
 	"github.com/demsasha4yt/gocrm.git/internal/app/store"
@@ -43,8 +45,16 @@ func (r *UserRepository) Create(u *models.User) error {
 // Find user
 func (r *UserRepository) Find(id int) (*models.User, error) {
 	u := &models.User{}
+
+	var units []byte
 	if err := r.store.db.QueryRow(
-		"SELECT id, login, password, email, first_name, last_name, third_name, access_level FROM users WHERE id = $1",
+		`SELECT users.id, users.login, users.password, users.email, users.first_name, users.last_name, users.third_name, users.access_level, 
+			COALESCE(json_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units
+		FROM users
+		LEFT JOIN users_units uu ON uu.user_id = users.id
+		LEFT JOIN units ON units.id = uu.unit_id
+		WHERE users.id = $1
+		GROUP BY users.id`,
 		id,
 	).Scan(
 		&u.ID,
@@ -55,13 +65,15 @@ func (r *UserRepository) Find(id int) (*models.User, error) {
 		&u.LastName,
 		&u.ThirdName,
 		&u.AccessLevel,
+		&units,
 	); err != nil {
+		fmt.Printf("%+v", err)
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
 		}
 		return nil, err
 	}
-	if err := findUnits(r, u); err != nil {
+	if err := json.Unmarshal(units, &u.Units); err != nil {
 		return nil, err
 	}
 	return u, nil
@@ -70,8 +82,16 @@ func (r *UserRepository) Find(id int) (*models.User, error) {
 // FindByEmail user by Email
 func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 	u := &models.User{}
+
+	var units []byte
 	if err := r.store.db.QueryRow(
-		"SELECT id, login, password, email, first_name, last_name, third_name, access_level FROM users WHERE email = $1",
+		`SELECT users.id, users.login, users.password, users.email, users.first_name, users.last_name, users.third_name, users.access_level, 
+			COALESCE(json_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units
+		FROM users
+		LEFT JOIN users_units uu ON uu.user_id = users.id
+		LEFT JOIN units ON units.id = uu.unit_id
+		WHERE users.email = '$1'
+		GROUP BY users.id`,
 		email,
 	).Scan(
 		&u.ID,
@@ -82,13 +102,14 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 		&u.LastName,
 		&u.ThirdName,
 		&u.AccessLevel,
+		&units,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
 		}
 		return nil, err
 	}
-	if err := findUnits(r, u); err != nil {
+	if err := json.Unmarshal(units, &u.Units); err != nil {
 		return nil, err
 	}
 	return u, nil
@@ -97,8 +118,16 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 // FindByLogin user by Login
 func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
 	u := &models.User{}
+
+	var units []byte
 	if err := r.store.db.QueryRow(
-		"SELECT id, login, password, email, first_name, last_name, third_name, access_level FROM users WHERE login = $1",
+		`SELECT users.id, users.login, users.password, users.email, users.first_name, users.last_name, users.third_name, users.access_level, 
+			COALESCE(json_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units
+		FROM users
+		LEFT JOIN users_units uu ON uu.user_id = users.id
+		LEFT JOIN units ON units.id = uu.unit_id
+		WHERE users.login = '$1'
+		GROUP BY users.id`,
 		login,
 	).Scan(
 		&u.ID,
@@ -109,13 +138,15 @@ func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
 		&u.LastName,
 		&u.ThirdName,
 		&u.AccessLevel,
+		&units,
 	); err != nil {
+		fmt.Printf("%+v", err)
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
 		}
 		return nil, err
 	}
-	if err := findUnits(r, u); err != nil {
+	if err := json.Unmarshal(units, &u.Units); err != nil {
 		return nil, err
 	}
 	return u, nil
