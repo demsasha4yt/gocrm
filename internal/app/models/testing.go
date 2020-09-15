@@ -22,3 +22,17 @@ func TestUnit(t *testing.T) *Unit {
 		Address: "Test Address",
 	}
 }
+
+// TestManufacturer ...
+func TestManufacturer(t *testing.T) *Manufacturer {
+	m := &Manufacturer{
+		Name:        "Тестовый производитель",
+		Description: "Каширка 19к2",
+	}
+	m.Units = append(m.Units, &Unit{
+		ID:      1,
+		Name:    "test",
+		Address: "Net",
+	})
+	return m
+}

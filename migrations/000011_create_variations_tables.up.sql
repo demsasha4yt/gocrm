@@ -3,7 +3,7 @@ CREATE TABLE variations (
 	name VARCHAR,
 	description VARCHAR,
 	price INT CONSTRAINT positive_price CHECK (price > 0),
-	product_id BIGINT
+	product_id BIGINT,
 	CONSTRAINT fk_products
 		FOREIGN KEY(product_id)
 			REFERENCES products(id)

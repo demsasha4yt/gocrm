@@ -50,7 +50,7 @@ CREATE TABLE products (
 CREATE TABLE products_categories (
 	id BIGSERIAL PRIMARY KEY,
 	product_id BIGINT,
-	category_id BIGINT
+	category_id BIGINT,
 		CONSTRAINT fk_products
 			FOREIGN KEY(product_id)
 					REFERENCES products(id)

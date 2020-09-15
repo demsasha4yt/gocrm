@@ -15,6 +15,7 @@ type Unit struct {
 func (u *Unit) Validate() error {
 	return validation.ValidateStruct(
 		u,
+		validation.Field(&u.ID, validation.Min(1)),
 		validation.Field(&u.Name, validation.Required),
 		validation.Field(&u.Address, validation.Required),
 	)

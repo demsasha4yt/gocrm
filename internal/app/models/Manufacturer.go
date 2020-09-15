@@ -1,5 +1,9 @@
 package models
 
+import (
+	validation "github.com/go-ozzo/ozzo-validation"
+)
+
 // Manufacturer ...
 type Manufacturer struct {
 	ID          int     `json:"id"`
@@ -10,5 +14,10 @@ type Manufacturer struct {
 
 // Validate ...
 func (s *Manufacturer) Validate() error {
-	return nil
+	return validation.ValidateStruct(
+		s,
+		validation.Field(&s.Name, validation.Required, validation.Length(1, 64)),
+		validation.Field(&s.Description, validation.Length(1, 1024)),
+		validation.Field(&s.Units),
+	)
 }
