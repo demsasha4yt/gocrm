@@ -58,24 +58,6 @@ func TestManufacturer_Validate(t *testing.T) {
 			},
 			isValid: true,
 		},
-		{
-			name: "Unit has no name",
-			s: func() *models.Manufacturer {
-				s := models.TestManufacturer(t)
-				s.Units[0].Name = ""
-				return s
-			},
-			isValid: false,
-		},
-		{
-			name: "Wrong Unit ID",
-			s: func() *models.Manufacturer {
-				s := models.TestManufacturer(t)
-				s.Units[0].ID = 0
-				return s
-			},
-			isValid: false,
-		},
 	}
 
 	for _, tc := range testCases {

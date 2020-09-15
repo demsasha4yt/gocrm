@@ -18,6 +18,5 @@ func (s *Manufacturer) Validate() error {
 		s,
 		validation.Field(&s.Name, validation.Required, validation.Length(1, 64)),
 		validation.Field(&s.Description, validation.Length(1, 1024)),
-		validation.Field(&s.Units),
 	)
 }
