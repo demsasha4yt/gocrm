@@ -9,6 +9,9 @@ type ManufacturersRepository struct {
 
 // Create ...
 func (r *ManufacturersRepository) Create(u *models.Manufacturer) error {
+	if err := u.Validate(); err != nil {
+		return err
+	}
 	return nil
 }
 

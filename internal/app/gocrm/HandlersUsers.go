@@ -2,20 +2,9 @@ package gocrm
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/demsasha4yt/gocrm.git/internal/app/models"
-)
-
-const (
-	sessionName = "gocrm_my"
-)
-
-var (
-	errIncorectEmailOrPassword = errors.New("Неправильный логин или пароль")
-	errNotAuthorized           = errors.New("Вы не авторизованы")
-	errHasNoRights             = errors.New("Вы не можете этого сделать")
 )
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
@@ -48,20 +37,26 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleUsersUpdate() http.HandlerFunc {
+func (s *server) handleUsersGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !s.checkUserAccessRights(r.Context(), models.UserAccessRRS) {
-			s.error(w, r, http.StatusUnauthorized, errHasNoRights)
-			return
-		}
+		s.error(w, r, http.StatusNotImplemented, errNoImplemented)
 	}
 }
 
-func (s *server) handleUserDelete() http.HandlerFunc {
+func (s *server) handleUsersFind() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !s.checkUserAccessRights(r.Context(), models.UserAccessRRS) {
-			s.error(w, r, http.StatusUnauthorized, errHasNoRights)
-			return
-		}
+		s.error(w, r, http.StatusNotImplemented, errNoImplemented)
+	}
+}
+
+func (s *server) handleUsersUpdate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		s.error(w, r, http.StatusNotImplemented, errNoImplemented)
+	}
+}
+
+func (s *server) handleUsersDelete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		s.error(w, r, http.StatusNotImplemented, errNoImplemented)
 	}
 }

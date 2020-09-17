@@ -1,14 +1,18 @@
 package gocrm
 
 import (
-	"database/sql"
+	"context"
 	"net/http"
-
-	"log"
+	"time"
 
 	"github.com/demsasha4yt/gocrm.git/internal/app/store/sqlstore"
 	"github.com/gorilla/sessions"
+	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v4/log/logrusadapter"
+	"github.com/jackc/pgx/v4/pgxpool"
+
 	_ "github.com/lib/pq" // ...
+	"github.com/sirupsen/logrus"
 )
 
 // Start aplication
@@ -29,13 +33,16 @@ func Start(config *Config) error {
 	return http.ListenAndServe(config.BindAddr, srv)
 }
 
-func newDB(databaseURL string) (*sql.DB, error) {
-	log.Println("[SQL]: Connecting to SQL..")
-	db, err := sql.Open("postgres", databaseURL)
-
+func newDB(databaseURL string) (*pgxpool.Pool, error) {
+	config, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
 		return nil, err
 	}
-	log.Println("[SQL]: Success!")
-	return db, nil
+
+	config.MaxConns = 100
+	config.MaxConnLifetime = time.Second * 15
+	config.ConnConfig.LogLevel = pgx.LogLevelTrace
+	config.ConnConfig.Logger = logrusadapter.NewLogger(logrus.New())
+
+	return pgxpool.ConnectConfig(context.Background(), config)
 }

@@ -1,14 +1,13 @@
 package sqlstore
 
 import (
-	"database/sql"
-
 	"github.com/demsasha4yt/gocrm.git/internal/app/store"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // Store implements Store interface
 type Store struct {
-	db                      *sql.DB
+	db                      *pgxpool.Pool
 	categoriesRepository    *CategoriesRepository
 	customersRepository     *CustomersRepository
 	manufacturersRepository *ManufacturersRepository
@@ -24,7 +23,7 @@ type Store struct {
 }
 
 // New creates new Store
-func New(db *sql.DB) store.Store {
+func New(db *pgxpool.Pool) store.Store {
 	return &Store{
 		db: db,
 	}
@@ -186,7 +185,7 @@ func (s *Store) Variations() store.VariationsRepository {
 	return s.variationsRepository
 }
 
-// GetConn returns connection
-func (s *Store) GetConn() *sql.DB {
+// GetDB returns connection
+func (s *Store) GetDB() *pgxpool.Pool {
 	return s.db
 }

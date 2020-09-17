@@ -1,6 +1,7 @@
 package sqlstore
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/demsasha4yt/gocrm.git/internal/app/models"
@@ -17,7 +18,7 @@ func (r *UnitRepository) Create(u *models.Unit) error {
 	if err := u.Validate(); err != nil {
 		return err
 	}
-	return r.store.db.QueryRow("INSERT INTO units(name, address) VALUES($1, $2) RETURNING id",
+	return r.store.db.QueryRow(context.Background(), "INSERT INTO units(name, address) VALUES($1, $2) RETURNING id",
 		u.Name,
 		u.Address,
 	).Scan(&u.ID)
@@ -27,6 +28,7 @@ func (r *UnitRepository) Create(u *models.Unit) error {
 func (r *UnitRepository) Find(id int) (*models.Unit, error) {
 	u := &models.Unit{}
 	if err := r.store.db.QueryRow(
+		context.Background(),
 		"SELECT id, name, address FROM units WHERE id = $1",
 		id,
 	).Scan(
@@ -44,7 +46,7 @@ func (r *UnitRepository) Find(id int) (*models.Unit, error) {
 
 // Delete ..
 func (r *UnitRepository) Delete(id int) error {
-	_, err := r.store.db.Exec("DELETE FROM units WHERE id=$1", id)
+	_, err := r.store.db.Exec(context.Background(), "DELETE FROM units WHERE id=$1", id)
 	if err != nil {
 		return err
 	}
@@ -67,6 +69,7 @@ func (r *UnitRepository) Update(id int, u *models.Unit) error {
 		unitDetails.Address = u.Address
 	}
 	_, err = r.store.db.Exec(
+		context.Background(),
 		"UPDATE units SET(name, address) = ($1, $2) WHERE id=$3",
 		&unitDetails.Name,
 		&unitDetails.Address,
@@ -82,7 +85,9 @@ func (r *UnitRepository) Update(id int, u *models.Unit) error {
 // FindUnitsByUserID ...
 func (r *UnitRepository) FindUnitsByUserID(id int) ([]*models.Unit, error) {
 	var result []*models.Unit
-	rows, err := r.store.db.Query(`SELECT units.id, units.name, units.address FROM units
+	rows, err := r.store.db.Query(
+		context.Background(),
+		`SELECT units.id, units.name, units.address FROM units
 	JOIN users_units uu ON uu.unit_id = units.id
 	JOIN users ON users.id = uu.user_id
 	WHERE users.id = $1`, id)

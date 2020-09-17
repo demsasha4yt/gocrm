@@ -1,30 +1,31 @@
 package sqlstore
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/jackc/pgx/v4/pgxpool"
 	_ "github.com/lib/pq" // ...
 )
 
 // TestDB ..
-func TestDB(t *testing.T, databaseURL string) (*sql.DB, func(...string)) {
+func TestDB(t *testing.T, databaseURL string) (*pgxpool.Pool, func(...string)) {
 	t.Helper()
 
-	db, err := sql.Open("postgres", databaseURL)
+	db, err := pgxpool.Connect(context.Background(), databaseURL)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err := db.Ping(); err != nil {
-		t.Fatal(err)
-	}
+	// if err := db.Ping(); err != nil {
+	// 	t.Fatal(err)
+	// }
 
 	return db, func(tables ...string) {
 		if len(tables) > 0 {
-			db.Exec(fmt.Sprintf("TRUNCATE %s CASCADE", strings.Join(tables, ", ")))
+			db.Exec(context.Background(), fmt.Sprintf("TRUNCATE %s CASCADE", strings.Join(tables, ", ")))
 		}
 
 		db.Close()

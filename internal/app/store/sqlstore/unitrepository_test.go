@@ -1,6 +1,7 @@
 package sqlstore_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/demsasha4yt/gocrm.git/internal/app/models"
@@ -88,7 +89,7 @@ func TestUnitRepository_FindUnitsByUserID(t *testing.T) {
 
 	user := models.TestUser(t)
 	assert.NoError(t, s.User().Create(user))
-	if _, err := db.Query(`INSERT INTO users_units(user_id, unit_id)
+	if _, err := db.Query(context.Background(), `INSERT INTO users_units(user_id, unit_id)
 	VALUES ($1, $2), ($1, $3)`, user.ID, u.ID, u2.ID); err != nil {
 		t.Fatal(err)
 	}

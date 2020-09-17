@@ -7,7 +7,7 @@ import (
 	"github.com/demsasha4yt/gocrm.git/internal/app/models"
 )
 
-func (s *server) handleSessionCreate() http.HandlerFunc {
+func (s *server) handleSignIn() http.HandlerFunc {
 	type request struct {
 		Login    string `json:"login"`
 		Password string `json:"password"`
@@ -34,6 +34,12 @@ func (s *server) handleSessionCreate() http.HandlerFunc {
 			return
 		}
 		s.respond(w, r, http.StatusOK, nil)
+	}
+}
+
+func (s *server) handleLogout() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		s.error(w, r, http.StatusNotImplemented, errNoImplemented)
 	}
 }
 
