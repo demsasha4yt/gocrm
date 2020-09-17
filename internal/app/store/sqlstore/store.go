@@ -184,8 +184,3 @@ func (s *Store) Variations() store.VariationsRepository {
 
 	return s.variationsRepository
 }
-
-// GetDB returns connection
-func (s *Store) GetDB() *pgxpool.Pool {
-	return s.db
-}

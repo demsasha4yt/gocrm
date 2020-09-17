@@ -11,7 +11,6 @@ import (
 	"github.com/jackc/pgx/v4/log/logrusadapter"
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	_ "github.com/lib/pq" // ...
 	"github.com/sirupsen/logrus"
 )
 

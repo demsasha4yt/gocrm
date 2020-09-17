@@ -18,12 +18,12 @@ type UnitRepository interface {
 	Find(int) (*models.Unit, error)
 	Delete(int) error
 	Update(int, *models.Unit) error
-	FindUnitsByUserID(int) ([]*models.Unit, error)
 }
 
 // CategoriesRepository interface
 type CategoriesRepository interface {
 	Create(*models.Category) error
+	FindAll() ([]*models.Category, error)
 	Find(int) (*models.Category, error)
 	Delete(int) error
 	Update(int, *models.Category) error
@@ -40,6 +40,7 @@ type CustomersRepository interface {
 // ManufacturersRepository interface
 type ManufacturersRepository interface {
 	Create(*models.Manufacturer) error
+	FindAll(int) ([]*models.Manufacturer, error)
 	Find(int) (*models.Manufacturer, error)
 	Delete(int) error
 	Update(int, *models.Manufacturer) error

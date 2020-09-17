@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/demsasha4yt/gocrm.git/internal/app/models"
-	"github.com/demsasha4yt/gocrm.git/internal/app/store"
 	"github.com/demsasha4yt/gocrm.git/internal/app/store/sqlstore"
 	"github.com/stretchr/testify/assert"
 )
@@ -38,7 +37,7 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 	s := sqlstore.New(db)
 	u1 := models.TestUser(t)
 	_, err := s.User().FindByEmail(u1.Email)
-	assert.EqualError(t, err, store.ErrRecordNotFound.Error())
+	assert.Error(t, err)
 
 	s.User().Create(u1)
 	u2, err := s.User().FindByEmail(u1.Email)
@@ -53,7 +52,7 @@ func TestUserRepository_FindByLogin(t *testing.T) {
 	s := sqlstore.New(db)
 	u1 := models.TestUser(t)
 	_, err := s.User().FindByLogin(u1.Login)
-	assert.EqualError(t, err, store.ErrRecordNotFound.Error())
+	assert.Error(t, err)
 
 	s.User().Create(u1)
 	u2, err := s.User().FindByLogin(u1.Login)

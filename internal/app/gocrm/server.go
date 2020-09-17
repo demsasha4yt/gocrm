@@ -89,10 +89,17 @@ func (s *server) configureRouter() {
 
 	// /api/manufacturers
 	api.HandleFunc("/manufacturers", s.handleManufacturersCreate()).Methods("POST")
-	api.HandleFunc("/manufacturers", s.handleManufacturersGet()).Methods("GET")
+	api.HandleFunc("/manufacturers", s.handleManufacturersGet()).Methods("GET").Queries("page", "{page}")
 	api.HandleFunc("/manufacturers/{id:[0-9]+}", s.handleManufacturersFind()).Methods("GET")
 	api.HandleFunc("/manufacturers/{id:[0-9]+}", s.handleManufacturersUpdate()).Methods("PUT")
 	api.HandleFunc("/manufacturers/{id:[0-9]+}", s.handleManufacturersDelete()).Methods("DELETE")
+
+	// /api/categorues
+	api.HandleFunc("/categories", s.handleCategoriesCreate()).Methods("POST")
+	api.HandleFunc("/categories", s.handleCategoriesGet()).Methods("GET")
+	api.HandleFunc("/categories/{id:[0-9]+}", s.handleCategoriesFind()).Methods("GET")
+	api.HandleFunc("/categories/{id:[0-9]+}", s.handleCategoriesUpdate()).Methods("PUT")
+	api.HandleFunc("/categories/{id:[0-9]+}", s.handleCategoriesDelete()).Methods("DELETE")
 
 	// Serve static files for SPA
 	spa := &spaHandler{staticPath: "ui/dist", indexPath: "index.html"}

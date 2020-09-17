@@ -1,7 +1,6 @@
 package sqlstore_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/demsasha4yt/gocrm.git/internal/app/models"
@@ -73,35 +72,4 @@ func TestUnitRepository_Update(t *testing.T) {
 	assert.Equal(t, "New Address", unit.Address)
 
 	assert.Error(t, s.Unit().Update(100500, newU))
-}
-
-func TestUnitRepository_FindUnitsByUserID(t *testing.T) {
-	db, teardown := sqlstore.TestDB(t, databaseURL)
-	defer teardown("units", "users")
-
-	s := sqlstore.New(db)
-	u := models.TestUnit(t)
-	u.Name = "1"
-	u2 := models.TestUnit(t)
-	u2.Name = "2"
-	assert.NoError(t, s.Unit().Create(u))
-	assert.NoError(t, s.Unit().Create(u2))
-
-	user := models.TestUser(t)
-	assert.NoError(t, s.User().Create(user))
-	if _, err := db.Query(context.Background(), `INSERT INTO users_units(user_id, unit_id)
-	VALUES ($1, $2), ($1, $3)`, user.ID, u.ID, u2.ID); err != nil {
-		t.Fatal(err)
-	}
-	units, err := s.Unit().FindUnitsByUserID(user.ID)
-	assert.NoError(t, err)
-	assert.Len(t, units, 2)
-
-	user2 := models.TestUser(t)
-	user2.Login = "2"
-	user2.Email = "2@yandex.ru"
-	assert.NoError(t, s.User().Create(user2))
-	units, err = s.Unit().FindUnitsByUserID(user2.ID)
-	assert.NoError(t, err)
-	assert.Len(t, units, 0)
 }

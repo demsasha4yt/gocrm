@@ -29,10 +29,12 @@ func TestManufacturer(t *testing.T) *Manufacturer {
 		Name:        "Тестовый производитель",
 		Description: "Каширка 19к2",
 	}
-	m.Units = append(m.Units, &Unit{
-		ID:      1,
-		Name:    "test",
-		Address: "Net",
-	})
 	return m
+}
+
+// TestCategory ..
+func TestCategory(t *testing.T) *Category {
+	return &Category{
+		Name: "Suka",
+	}
 }

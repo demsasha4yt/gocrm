@@ -15,15 +15,6 @@ type UserRepository struct {
 	store *Store
 }
 
-func findUnits(r *UserRepository, u *models.User) error {
-	units, err := r.store.Unit().FindUnitsByUserID(u.ID)
-	if err != nil {
-		return err
-	}
-	u.Units = units
-	return nil
-}
-
 // Create creates user
 func (r *UserRepository) Create(u *models.User) error {
 	if err := u.Validate(); err != nil {
@@ -70,7 +61,6 @@ func (r *UserRepository) Find(id int) (*models.User, error) {
 		&u.AccessLevel,
 		&units,
 	); err != nil {
-		fmt.Printf("%+v", err)
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
 		}
@@ -94,7 +84,7 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 		FROM users
 		LEFT JOIN users_units uu ON uu.user_id = users.id
 		LEFT JOIN units ON units.id = uu.unit_id
-		WHERE users.email = '$1'
+		WHERE users.email = $1
 		GROUP BY users.id`,
 		email,
 	).Scan(
@@ -131,7 +121,7 @@ func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
 		FROM users
 		LEFT JOIN users_units uu ON uu.user_id = users.id
 		LEFT JOIN units ON units.id = uu.unit_id
-		WHERE users.login = '$1'
+		WHERE users.login = $1
 		GROUP BY users.id`,
 		login,
 	).Scan(

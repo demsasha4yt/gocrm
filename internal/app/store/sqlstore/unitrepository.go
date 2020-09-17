@@ -81,30 +81,3 @@ func (r *UnitRepository) Update(id int, u *models.Unit) error {
 	u = unitDetails
 	return nil
 }
-
-// FindUnitsByUserID ...
-func (r *UnitRepository) FindUnitsByUserID(id int) ([]*models.Unit, error) {
-	var result []*models.Unit
-	rows, err := r.store.db.Query(
-		context.Background(),
-		`SELECT units.id, units.name, units.address FROM units
-	JOIN users_units uu ON uu.unit_id = units.id
-	JOIN users ON users.id = uu.user_id
-	WHERE users.id = $1`, id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		u := &models.Unit{}
-		if err := rows.Scan(
-			&u.ID,
-			&u.Name,
-			&u.Address,
-		); err != nil {
-			return nil, err
-		}
-		result = append(result, u)
-	}
-	return result, nil
-}

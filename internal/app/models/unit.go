@@ -9,6 +9,7 @@ type Unit struct {
 	Address       string          `json:"address,omitempty"`
 	Users         []*User         `json:"users,omitempty"`
 	Manufacturers []*Manufacturer `json:"manufacturers,omitempty"`
+	Categories    []*Manufacturer `json:"categories,omitempty"`
 }
 
 // Validate validates unit
