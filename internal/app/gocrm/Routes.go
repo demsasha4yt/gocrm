@@ -50,7 +50,7 @@ func (s *server) registerRouters() *Router {
 			&Route{
 				Name:             "Signin",
 				Method:           "POST",
-				Pattern:          "/sign_in",
+				Pattern:          "/signin",
 				AccessMiddleware: MiddlewareFuncs{s.AccessMiddleware()},
 				Handler:          s.handleSignIn,
 			},
@@ -71,8 +71,8 @@ func (s *server) registerRouters() *Router {
 					// Info about session user
 					&Route{
 						Name:             "InfoAboutSession",
-						Method:           "POST",
-						Pattern:          "/users",
+						Method:           "GET",
+						Pattern:          "/info",
 						AccessMiddleware: MiddlewareFuncs{s.AccessMiddleware()},
 						Handler:          s.handleWhoAmI,
 					},

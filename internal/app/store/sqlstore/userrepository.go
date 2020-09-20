@@ -40,15 +40,19 @@ func (r *UserRepository) Find(id int) (*models.User, error) {
 	u := &models.User{}
 
 	var units []byte
+	var accessLevel []byte
 	if err := r.store.db.QueryRow(
 		context.Background(),
 		`SELECT users.id, users.login, users.password, users.email, users.first_name, users.last_name, users.third_name, users.access_level, 
-			COALESCE(json_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units
+		COALESCE(jsonb_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units,
+		to_jsonb(al) as access_level
 		FROM users
 		LEFT JOIN users_units uu ON uu.user_id = users.id
 		LEFT JOIN units ON units.id = uu.unit_id
+		LEFT JOIN access_levels al ON al.id = users.access_level
 		WHERE users.id = $1
-		GROUP BY users.id`,
+		GROUP BY users.id, al.id
+		LIMIT 1`,
 		id,
 	).Scan(
 		&u.ID,
@@ -60,6 +64,7 @@ func (r *UserRepository) Find(id int) (*models.User, error) {
 		&u.ThirdName,
 		&u.AccessLevelID,
 		&units,
+		&accessLevel,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
@@ -67,6 +72,9 @@ func (r *UserRepository) Find(id int) (*models.User, error) {
 		return nil, err
 	}
 	if err := json.Unmarshal(units, &u.Units); err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(accessLevel, &u.AccessLevel); err != nil {
 		return nil, err
 	}
 	return u, nil
@@ -81,14 +89,15 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 	if err := r.store.db.QueryRow(
 		context.Background(),
 		`SELECT users.id, users.login, users.password, users.email, users.first_name, users.last_name, users.third_name, users.access_level, 
-		COALESCE(json_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units,
-		json_agg(al) as access_level
+		COALESCE(jsonb_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units,
+		to_jsonb(al) as access_level
 		FROM users
 		LEFT JOIN users_units uu ON uu.user_id = users.id
 		LEFT JOIN units ON units.id = uu.unit_id
 		LEFT JOIN access_levels al ON al.id = users.access_level
-		WHERE users.id = $1
-		GROUP BY users.id, al.id`,
+		WHERE users.login = $1
+		GROUP BY users.id, al.id
+		LIMIT 1`,
 		email,
 	).Scan(
 		&u.ID,
@@ -121,6 +130,7 @@ func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
 	u := &models.User{}
 
 	var units []byte
+	var accessLevel []byte
 	if err := r.store.db.QueryRow(
 		context.Background(),
 		`SELECT users.id, users.login, users.password, users.email, users.first_name, users.last_name, users.third_name, users.access_level, 
@@ -129,7 +139,8 @@ func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
 		LEFT JOIN users_units uu ON uu.user_id = users.id
 		LEFT JOIN units ON units.id = uu.unit_id
 		WHERE users.login = $1
-		GROUP BY users.id`,
+		GROUP BY users.id
+		LIMIT 1`,
 		login,
 	).Scan(
 		&u.ID,
@@ -141,6 +152,7 @@ func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
 		&u.ThirdName,
 		&u.AccessLevelID,
 		&units,
+		&accessLevel,
 	); err != nil {
 		fmt.Printf("%+v", err)
 		if err == sql.ErrNoRows {
@@ -149,6 +161,9 @@ func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
 		return nil, err
 	}
 	if err := json.Unmarshal(units, &u.Units); err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(accessLevel, &u.AccessLevel); err != nil {
 		return nil, err
 	}
 	return u, nil
