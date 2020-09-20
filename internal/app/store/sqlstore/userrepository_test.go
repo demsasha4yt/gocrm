@@ -1,6 +1,7 @@
 package sqlstore_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/demsasha4yt/gocrm.git/internal/app/models"
@@ -14,7 +15,7 @@ func TestUserRepository_Create(t *testing.T) {
 
 	s := sqlstore.New(db)
 	u := models.TestUser(t)
-	assert.NoError(t, s.User().Create(u))
+	assert.NoError(t, s.User().Create(context.Background(), u))
 	assert.NotNil(t, u.ID)
 }
 
@@ -24,8 +25,8 @@ func TestUserRepository_Find(t *testing.T) {
 
 	s := sqlstore.New(db)
 	u1 := models.TestUser(t)
-	s.User().Create(u1)
-	u2, err := s.User().Find(u1.ID)
+	s.User().Create(context.Background(), u1)
+	u2, err := s.User().Find(context.Background(), u1.ID)
 	assert.NoError(t, err)
 	assert.NotNil(t, u2)
 }
@@ -36,11 +37,11 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 
 	s := sqlstore.New(db)
 	u1 := models.TestUser(t)
-	_, err := s.User().FindByEmail(u1.Email)
+	_, err := s.User().FindByEmail(context.Background(), u1.Email)
 	assert.Error(t, err)
 
-	s.User().Create(u1)
-	u2, err := s.User().FindByEmail(u1.Email)
+	s.User().Create(context.Background(), u1)
+	u2, err := s.User().FindByEmail(context.Background(), u1.Email)
 	assert.NoError(t, err)
 	assert.NotNil(t, u2)
 }
@@ -51,11 +52,11 @@ func TestUserRepository_FindByLogin(t *testing.T) {
 
 	s := sqlstore.New(db)
 	u1 := models.TestUser(t)
-	_, err := s.User().FindByLogin(u1.Login)
+	_, err := s.User().FindByLogin(context.Background(), u1.Login)
 	assert.Error(t, err)
 
-	s.User().Create(u1)
-	u2, err := s.User().FindByLogin(u1.Login)
+	s.User().Create(context.Background(), u1)
+	u2, err := s.User().FindByLogin(context.Background(), u1.Login)
 	assert.NoError(t, err)
 	assert.NotNil(t, u2)
 }
@@ -65,10 +66,10 @@ func TestUserRepository_Delete(t *testing.T) {
 	defer teardown()
 
 	s := sqlstore.New(db)
-	err := s.User().Delete(100)
+	err := s.User().Delete(context.Background(), 100)
 	assert.NoError(t, err)
 
-	u, _ := s.User().Find(100)
+	u, _ := s.User().Find(context.Background(), 100)
 	assert.Nil(t, u)
 }
 
@@ -79,7 +80,7 @@ func TestUserRepository_Update(t *testing.T) {
 	s := sqlstore.New(db)
 	u := models.TestUser(t)
 
-	assert.NoError(t, s.User().Create(u))
+	assert.NoError(t, s.User().Create(context.Background(), u))
 	assert.NotNil(t, u.ID)
 
 	newU := &models.User{
@@ -90,7 +91,7 @@ func TestUserRepository_Update(t *testing.T) {
 		Email:         "dd@yandex.ru",
 		Login:         "TestLogin",
 	}
-	assert.NoError(t, s.User().Update(u.ID, newU))
+	assert.NoError(t, s.User().Update(context.Background(), u.ID, newU))
 	assert.Equal(t, newU.FirstName, "Test1")
 	assert.Equal(t, newU.LastName, "Test1")
 	assert.Equal(t, newU.ThirdName, "Test1")
@@ -98,7 +99,7 @@ func TestUserRepository_Update(t *testing.T) {
 	assert.Equal(t, newU.Login, "TestLogin")
 	assert.Equal(t, newU.Email, "dd@yandex.ru")
 
-	user, err := s.User().Find(u.ID)
+	user, err := s.User().Find(context.Background(), u.ID)
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 	assert.Equal(t, user.FirstName, "Test1")

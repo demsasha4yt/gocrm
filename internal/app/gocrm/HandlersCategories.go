@@ -25,7 +25,7 @@ func (s *server) handleCategoriesCreate() http.HandlerFunc {
 			Description: req.Description,
 			ParentID:    req.ParentID,
 		}
-		if err := s.store.Categories().Create(u); err != nil {
+		if err := s.store.Categories().Create(r.Context(), u); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
@@ -35,7 +35,7 @@ func (s *server) handleCategoriesCreate() http.HandlerFunc {
 
 func (s *server) handleCategoriesGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		categories, err := s.store.Categories().FindAll()
+		categories, err := s.store.Categories().FindAll(r.Context())
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return

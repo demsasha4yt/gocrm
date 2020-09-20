@@ -1,6 +1,7 @@
 package sqlstore_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -17,13 +18,13 @@ func TestManufacturersRepository_Create(t *testing.T) {
 	s := sqlstore.New(db)
 	m := models.TestManufacturer(t)
 
-	assert.NoError(t, s.Manufacturers().Create(m))
+	assert.NoError(t, s.Manufacturers().Create(context.Background(), m))
 	assert.NotEqual(t, m.ID, 0)
 
 	m2 := &models.Manufacturer{
 		Name: "HAHA",
 	}
-	assert.NoError(t, s.Manufacturers().Create(m2))
+	assert.NoError(t, s.Manufacturers().Create(context.Background(), m2))
 	assert.NotEqual(t, m2.ID, 0)
 }
 
@@ -34,10 +35,10 @@ func TestManufacturers_FindAll(t *testing.T) {
 	s := sqlstore.New(db)
 	m := models.TestManufacturer(t)
 
-	assert.NoError(t, s.Manufacturers().Create(m))
+	assert.NoError(t, s.Manufacturers().Create(context.Background(), m))
 	assert.NotEqual(t, m.ID, 0)
 
-	r, err := s.Manufacturers().FindAll()
+	r, err := s.Manufacturers().FindAll(context.Background())
 	assert.NoError(t, err)
 	assert.NotNil(t, r)
 }
@@ -50,23 +51,23 @@ func TestManufacturersRepository_Find(t *testing.T) {
 	s := sqlstore.New(db)
 	m := models.TestManufacturer(t)
 
-	assert.NoError(t, s.Manufacturers().Create(m))
+	assert.NoError(t, s.Manufacturers().Create(context.Background(), m))
 	assert.NotEqual(t, m.ID, 0)
 
 	m2 := &models.Manufacturer{
 		Name: "HAHA",
 	}
-	assert.NoError(t, s.Manufacturers().Create(m2))
+	assert.NoError(t, s.Manufacturers().Create(context.Background(), m2))
 	assert.NotEqual(t, m2.ID, 0)
 
-	f, err := s.Manufacturers().Find(m.ID)
+	f, err := s.Manufacturers().Find(context.Background(), m.ID)
 	assert.NoError(t, err)
 	assert.NotNil(t, f)
-	f2, err := s.Manufacturers().Find(m2.ID)
+	f2, err := s.Manufacturers().Find(context.Background(), m2.ID)
 	assert.NoError(t, err)
 	assert.NotNil(t, f2)
 
-	f3, err := s.Manufacturers().Find(1000500)
+	f3, err := s.Manufacturers().Find(context.Background(), 1000500)
 	assert.Error(t, err)
 	assert.Nil(t, f3)
 }
@@ -78,12 +79,12 @@ func TestManufacturersRepository_Delete(t *testing.T) {
 	s := sqlstore.New(db)
 	m := models.TestManufacturer(t)
 
-	assert.NoError(t, s.Manufacturers().Create(m))
+	assert.NoError(t, s.Manufacturers().Create(context.Background(), m))
 	assert.NotEqual(t, m.ID, 0)
 
-	assert.NoError(t, s.Manufacturers().Delete(m.ID))
+	assert.NoError(t, s.Manufacturers().Delete(context.Background(), m.ID))
 
-	f3, err := s.Manufacturers().Find(m.ID)
+	f3, err := s.Manufacturers().Find(context.Background(), m.ID)
 	assert.Error(t, err)
 	assert.Nil(t, f3)
 }
@@ -96,7 +97,7 @@ func TestManufacturersRepository_Update(t *testing.T) {
 
 	m := models.TestManufacturer(t)
 
-	assert.NoError(t, s.Manufacturers().Create(m))
+	assert.NoError(t, s.Manufacturers().Create(context.Background(), m))
 	assert.NotEqual(t, m.ID, 0)
 	fmt.Printf("%d\n", m.ID)
 	m2 := &models.Manufacturer{
@@ -104,9 +105,9 @@ func TestManufacturersRepository_Update(t *testing.T) {
 		Description: "Hello guys",
 	}
 
-	assert.NoError(t, s.Manufacturers().Update(m.ID, m2))
+	assert.NoError(t, s.Manufacturers().Update(context.Background(), m.ID, m2))
 	fmt.Printf("%d\n", m.ID)
-	m3, err := s.Manufacturers().Find(m.ID)
+	m3, err := s.Manufacturers().Find(context.Background(), m.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, "Hello guys", m3.Name)
 	assert.Equal(t, "Hello guys", m3.Description)

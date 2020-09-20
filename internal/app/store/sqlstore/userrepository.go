@@ -16,7 +16,7 @@ type UserRepository struct {
 }
 
 // Create creates user
-func (r *UserRepository) Create(u *models.User) error {
+func (r *UserRepository) Create(ctx context.Context, u *models.User) error {
 	if err := u.Validate(); err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (r *UserRepository) Create(u *models.User) error {
 	}
 
 	return r.store.db.QueryRow(
-		context.Background(),
+		ctx,
 		"INSERT INTO users (email, login, password, access_level) VALUES ($1, $2, $3, $4) RETURNING id",
 		u.Email,
 		u.Login,
@@ -36,13 +36,13 @@ func (r *UserRepository) Create(u *models.User) error {
 }
 
 // Find user
-func (r *UserRepository) Find(id int) (*models.User, error) {
+func (r *UserRepository) Find(ctx context.Context, id int) (*models.User, error) {
 	u := &models.User{}
 
 	var units []byte
 	var accessLevel []byte
 	if err := r.store.db.QueryRow(
-		context.Background(),
+		ctx,
 		`SELECT users.id, users.login, users.password, users.email, users.first_name, users.last_name, users.third_name, users.access_level, 
 		COALESCE(jsonb_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units,
 		to_jsonb(al) as access_level
@@ -81,13 +81,13 @@ func (r *UserRepository) Find(id int) (*models.User, error) {
 }
 
 // FindByEmail user by Email
-func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
+func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*models.User, error) {
 	u := &models.User{}
 
 	var units []byte
 	var accessLevel []byte
 	if err := r.store.db.QueryRow(
-		context.Background(),
+		ctx,
 		`SELECT users.id, users.login, users.password, users.email, users.first_name, users.last_name, users.third_name, users.access_level, 
 		COALESCE(jsonb_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units,
 		to_jsonb(al) as access_level
@@ -126,13 +126,13 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 }
 
 // FindByLogin user by Login
-func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
+func (r *UserRepository) FindByLogin(ctx context.Context, login string) (*models.User, error) {
 	u := &models.User{}
 
 	var units []byte
 	var accessLevel []byte
 	if err := r.store.db.QueryRow(
-		context.Background(),
+		ctx,
 		`SELECT users.id, users.login, users.password, users.email, users.first_name, users.last_name, users.third_name, users.access_level, 
 			COALESCE(json_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units
 		FROM users
@@ -170,8 +170,8 @@ func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
 }
 
 // Delete deletes user
-func (r *UserRepository) Delete(id int) error {
-	_, err := r.store.db.Exec(context.Background(), "DELETE FROM users WHERE id=$1", id)
+func (r *UserRepository) Delete(ctx context.Context, id int) error {
+	_, err := r.store.db.Exec(ctx, "DELETE FROM users WHERE id=$1", id)
 	if err != nil {
 		return err
 	}
@@ -179,13 +179,13 @@ func (r *UserRepository) Delete(id int) error {
 }
 
 // Update user
-func (r *UserRepository) Update(id int, u *models.User) error {
+func (r *UserRepository) Update(ctx context.Context, id int, u *models.User) error {
 	u.EncryptedPassword = "a" // to avoid validate passoword field
 	if err := u.Validate(); err != nil {
 		return err
 	}
 
-	userDetails, err := r.Find(id)
+	userDetails, err := r.Find(ctx, id)
 	if err != nil {
 		return store.ErrRecordNotFound
 	}
@@ -210,7 +210,7 @@ func (r *UserRepository) Update(id int, u *models.User) error {
 	}
 
 	_, err = r.store.db.Exec(
-		context.Background(),
+		ctx,
 		"UPDATE users SET(login, password, email, first_name, last_name, third_name, access_level) = ($1, $2, $3, $4, $5, $6, $7) WHERE id=$8",
 		userDetails.Login,
 		userDetails.EncryptedPassword,

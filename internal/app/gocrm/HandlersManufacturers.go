@@ -28,7 +28,7 @@ func (s *server) handleManufacturersCreate() http.HandlerFunc {
 		for _, unitID := range req.Units {
 			u.Units = append(u.Units, &models.Unit{ID: unitID})
 		}
-		if err := s.store.Manufacturers().Create(u); err != nil {
+		if err := s.store.Manufacturers().Create(r.Context(), u); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
@@ -38,7 +38,7 @@ func (s *server) handleManufacturersCreate() http.HandlerFunc {
 
 func (s *server) handleManufacturersGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		manufacturers, err := s.store.Manufacturers().FindAll()
+		manufacturers, err := s.store.Manufacturers().FindAll(r.Context())
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
@@ -54,7 +54,7 @@ func (s *server) handleManufacturersFind() http.HandlerFunc {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-		manufacturer, err := s.store.Manufacturers().Find(id)
+		manufacturer, err := s.store.Manufacturers().Find(r.Context(), id)
 		if err != nil {
 			s.error(w, r, http.StatusNotFound, err)
 			return
@@ -87,7 +87,7 @@ func (s *server) handleManufacturersUpdate() http.HandlerFunc {
 		for _, unitID := range req.Units {
 			u.Units = append(u.Units, &models.Unit{ID: unitID})
 		}
-		if err := s.store.Manufacturers().Update(id, u); err != nil {
+		if err := s.store.Manufacturers().Update(r.Context(), id, u); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 		s.respond(w, r, http.StatusOK, u)
@@ -101,7 +101,7 @@ func (s *server) handleManufacturersDelete() http.HandlerFunc {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-		if err := s.store.Manufacturers().Delete(id); err != nil {
+		if err := s.store.Manufacturers().Delete(r.Context(), id); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 		s.respond(w, r, http.StatusOK, "OK")

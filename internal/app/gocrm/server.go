@@ -72,11 +72,3 @@ func (s *server) configureRouter(router *mux.Router, subrouter *Router) {
 	}
 	s.logger.Infof("%s router loaded", subrouter.Name)
 }
-
-// 	// /api/categorues
-// 	api.HandleFunc("/categories", s.handleCategoriesCreate()).Methods("POST", "OPTIONS")
-// 	api.HandleFunc("/categories", s.handleCategoriesGet()).Methods("GET", "OPTIONS")
-// 	api.HandleFunc("/categories/{id:[0-9]+}", s.handleCategoriesFind()).Methods("GET", "OPTIONS")
-// 	api.HandleFunc("/categories/{id:[0-9]+}", s.handleCategoriesUpdate()).Methods("PUT", "OPTIONS")
-// 	api.HandleFunc("/categories/{id:[0-9]+}", s.handleCategoriesDelete()).Methods("DELETE", "OPTIONS")
-// }

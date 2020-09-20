@@ -15,19 +15,19 @@ type ManufacturersRepository struct {
 }
 
 // Create ...
-func (r *ManufacturersRepository) Create(u *models.Manufacturer) error {
+func (r *ManufacturersRepository) Create(ctx context.Context, u *models.Manufacturer) error {
 	if err := u.Validate(); err != nil {
 		return err
 	}
-	tx, err := r.store.db.Begin(context.Background())
+	tx, err := r.store.db.Begin(ctx)
 	if err != nil {
 		return err
 	}
 
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(ctx)
 
 	if err := tx.QueryRow(
-		context.Background(),
+		ctx,
 		"INSERT INTO manufacturers (name, description) VALUES ($1, $2) RETURNING id",
 		u.Name,
 		u.Description,
@@ -39,7 +39,7 @@ func (r *ManufacturersRepository) Create(u *models.Manufacturer) error {
 
 	for _, unit := range u.Units {
 		if _, err := tx.Exec(
-			context.Background(),
+			ctx,
 			"INSERT INTO manufacturers_units(manufacturer_id, unit_id) VALUES ($1, $2)",
 			u.ID, unit.ID,
 		); err != nil {
@@ -47,15 +47,15 @@ func (r *ManufacturersRepository) Create(u *models.Manufacturer) error {
 		}
 	}
 
-	return tx.Commit(context.Background())
+	return tx.Commit(ctx)
 }
 
 // FindAll ...
-func (r *ManufacturersRepository) FindAll() ([]*models.Manufacturer, error) {
+func (r *ManufacturersRepository) FindAll(ctx context.Context) ([]*models.Manufacturer, error) {
 	var m []*models.Manufacturer = make([]*models.Manufacturer, 0)
 
 	rows, err := r.store.db.Query(
-		context.Background(),
+		ctx,
 		`SELECT id, name, description FROM manufacturers`,
 	)
 	if err != nil {
@@ -76,12 +76,12 @@ func (r *ManufacturersRepository) FindAll() ([]*models.Manufacturer, error) {
 }
 
 // Find ...
-func (r *ManufacturersRepository) Find(id int) (*models.Manufacturer, error) {
+func (r *ManufacturersRepository) Find(ctx context.Context, id int) (*models.Manufacturer, error) {
 	u := &models.Manufacturer{}
 	var units []byte
 
 	if err := r.store.db.QueryRow(
-		context.Background(),
+		ctx,
 		`SELECT m.id, m.name, m.description,
 			COALESCE(json_agg(u) FILTER (WHERE u.id IS NOT NULL), '[]') AS units
 		FROM manufacturers m
@@ -108,8 +108,8 @@ func (r *ManufacturersRepository) Find(id int) (*models.Manufacturer, error) {
 }
 
 // Delete ...
-func (r *ManufacturersRepository) Delete(id int) error {
-	_, err := r.store.db.Exec(context.Background(), "DELETE FROM manufacturers WHERE id=$1", id)
+func (r *ManufacturersRepository) Delete(ctx context.Context, id int) error {
+	_, err := r.store.db.Exec(ctx, "DELETE FROM manufacturers WHERE id=$1", id)
 	if err != nil {
 		return err
 	}
@@ -117,11 +117,11 @@ func (r *ManufacturersRepository) Delete(id int) error {
 }
 
 // Update ...
-func (r *ManufacturersRepository) Update(id int, u *models.Manufacturer) error {
+func (r *ManufacturersRepository) Update(ctx context.Context, id int, u *models.Manufacturer) error {
 	if err := u.Validate(); err != nil {
 		return err
 	}
-	manufacturerDetails, err := r.Find(id)
+	manufacturerDetails, err := r.Find(ctx, id)
 	if err != nil {
 		return store.ErrRecordNotFound
 	}
@@ -132,7 +132,7 @@ func (r *ManufacturersRepository) Update(id int, u *models.Manufacturer) error {
 		manufacturerDetails.Description = u.Description
 	}
 	_, err = r.store.db.Exec(
-		context.Background(),
+		ctx,
 		"UPDATE manufacturers SET(name, description) = ($1, $2) WHERE id=$3",
 		&manufacturerDetails.Name,
 		&manufacturerDetails.Description,

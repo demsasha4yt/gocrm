@@ -1,6 +1,10 @@
 package sqlstore
 
-import "github.com/demsasha4yt/gocrm.git/internal/app/models"
+import (
+	"context"
+
+	"github.com/demsasha4yt/gocrm.git/internal/app/models"
+)
 
 // OptionsTypesRepository struct { ...
 type OptionsTypesRepository struct {
@@ -8,21 +12,21 @@ type OptionsTypesRepository struct {
 }
 
 // Create ...
-func (r *OptionsTypesRepository) Create(u *models.OptionType) error {
+func (r *OptionsTypesRepository) Create(ctx context.Context, u *models.OptionType) error {
 	return nil
 }
 
 // Find ...
-func (r *OptionsTypesRepository) Find(id int) (*models.OptionType, error) {
+func (r *OptionsTypesRepository) Find(ctx context.Context, id int) (*models.OptionType, error) {
 	return nil, nil
 }
 
 // Delete ...
-func (r *OptionsTypesRepository) Delete(id int) error {
+func (r *OptionsTypesRepository) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
 // Update ...
-func (r *OptionsTypesRepository) Update(id int, u *models.OptionType) error {
+func (r *OptionsTypesRepository) Update(ctx context.Context, id int, u *models.OptionType) error {
 	return nil
 }

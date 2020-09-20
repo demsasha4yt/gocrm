@@ -15,12 +15,12 @@ type CategoriesRepository struct {
 }
 
 // Create ...
-func (r *CategoriesRepository) Create(u *models.Category) error {
+func (r *CategoriesRepository) Create(ctx context.Context, u *models.Category) error {
 	if err := u.Validate(); err != nil {
 		return err
 	}
 	return r.store.db.QueryRow(
-		context.Background(),
+		ctx,
 		"INSERT INTO categories (name, description, parent_id) VALUES ($1, $2, $3) RETURNING id",
 		u.Name,
 		u.Description,
@@ -29,11 +29,11 @@ func (r *CategoriesRepository) Create(u *models.Category) error {
 }
 
 // FindAll ...
-func (r *CategoriesRepository) FindAll() ([]*models.Category, error) {
+func (r *CategoriesRepository) FindAll(ctx context.Context) ([]*models.Category, error) {
 	var categories []*models.Category = make([]*models.Category, 0)
 
 	rows, err := r.store.db.Query(
-		context.Background(),
+		ctx,
 		`SELECT c.id, c.name, c.description, c.parent_id,
 		COALESCE(jsonb_agg(cc) FILTER (WHERE cc.id IS NOT NULL), '[]') AS subcategories
 		FROM categories c
@@ -65,12 +65,12 @@ func (r *CategoriesRepository) FindAll() ([]*models.Category, error) {
 }
 
 // Find ...
-func (r *CategoriesRepository) Find(id int) (*models.Category, error) {
+func (r *CategoriesRepository) Find(ctx context.Context, id int) (*models.Category, error) {
 	u := &models.Category{}
 	var subs []byte
 
 	if err := r.store.db.QueryRow(
-		context.Background(),
+		ctx,
 		`SELECT c.id, c.name, c.description, c.parent_id,
 		COALESCE(jsonb_agg(cc) FILTER (WHERE cc.id IS NOT NULL), '[]') AS subcategories
 		FROM categories c
@@ -98,8 +98,8 @@ func (r *CategoriesRepository) Find(id int) (*models.Category, error) {
 }
 
 // Delete ...
-func (r *CategoriesRepository) Delete(id int) error {
-	_, err := r.store.db.Exec(context.Background(), "DELETE FROM categories WHERE id=$1", id)
+func (r *CategoriesRepository) Delete(ctx context.Context, id int) error {
+	_, err := r.store.db.Exec(ctx, "DELETE FROM categories WHERE id=$1", id)
 	if err != nil {
 		return err
 	}
@@ -107,11 +107,11 @@ func (r *CategoriesRepository) Delete(id int) error {
 }
 
 // Update ...
-func (r *CategoriesRepository) Update(id int, u *models.Category) error {
+func (r *CategoriesRepository) Update(ctx context.Context, id int, u *models.Category) error {
 	if err := u.Validate(); err != nil {
 		return err
 	}
-	categoryDetails, err := r.Find(id)
+	categoryDetails, err := r.Find(ctx, id)
 	if err != nil {
 		return store.ErrRecordNotFound
 	}
@@ -123,7 +123,7 @@ func (r *CategoriesRepository) Update(id int, u *models.Category) error {
 	}
 	categoryDetails.ParentID = u.ParentID
 	_, err = r.store.db.Exec(
-		context.Background(),
+		ctx,
 		"UPDATE categories SET(name, description, parent_id) = ($1, $2, $3) WHERE id=$4",
 		&categoryDetails.Name,
 		&categoryDetails.Description,

@@ -14,21 +14,21 @@ type UnitRepository struct {
 }
 
 // Create ..
-func (r *UnitRepository) Create(u *models.Unit) error {
+func (r *UnitRepository) Create(ctx context.Context, u *models.Unit) error {
 	if err := u.Validate(); err != nil {
 		return err
 	}
-	return r.store.db.QueryRow(context.Background(), "INSERT INTO units(name, address) VALUES($1, $2) RETURNING id",
+	return r.store.db.QueryRow(ctx, "INSERT INTO units(name, address) VALUES($1, $2) RETURNING id",
 		u.Name,
 		u.Address,
 	).Scan(&u.ID)
 }
 
 // Find ...
-func (r *UnitRepository) Find(id int) (*models.Unit, error) {
+func (r *UnitRepository) Find(ctx context.Context, id int) (*models.Unit, error) {
 	u := &models.Unit{}
 	if err := r.store.db.QueryRow(
-		context.Background(),
+		ctx,
 		"SELECT id, name, address FROM units WHERE id = $1",
 		id,
 	).Scan(
@@ -45,8 +45,8 @@ func (r *UnitRepository) Find(id int) (*models.Unit, error) {
 }
 
 // Delete ..
-func (r *UnitRepository) Delete(id int) error {
-	_, err := r.store.db.Exec(context.Background(), "DELETE FROM units WHERE id=$1", id)
+func (r *UnitRepository) Delete(ctx context.Context, id int) error {
+	_, err := r.store.db.Exec(ctx, "DELETE FROM units WHERE id=$1", id)
 	if err != nil {
 		return err
 	}
@@ -54,11 +54,11 @@ func (r *UnitRepository) Delete(id int) error {
 }
 
 // Update ...
-func (r *UnitRepository) Update(id int, u *models.Unit) error {
+func (r *UnitRepository) Update(ctx context.Context, id int, u *models.Unit) error {
 	if err := u.Validate(); err != nil {
 		return err
 	}
-	unitDetails, err := r.Find(id)
+	unitDetails, err := r.Find(ctx, id)
 	if err != nil {
 		return store.ErrRecordNotFound
 	}
@@ -69,7 +69,7 @@ func (r *UnitRepository) Update(id int, u *models.Unit) error {
 		unitDetails.Address = u.Address
 	}
 	_, err = r.store.db.Exec(
-		context.Background(),
+		ctx,
 		"UPDATE units SET(name, address) = ($1, $2) WHERE id=$3",
 		&unitDetails.Name,
 		&unitDetails.Address,

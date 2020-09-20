@@ -102,7 +102,7 @@ func (s *server) AccessMiddleware(access ...string) AccessMiddleware {
 					return
 				}
 				if !val.Bool() {
-					s.error(w, r, http.StatusMethodNotAllowed, errHasNoRights)
+					s.error(w, r, http.StatusForbidden, errHasNoRights)
 					return
 				}
 			}
