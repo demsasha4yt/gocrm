@@ -51,17 +51,12 @@ func (r *ManufacturersRepository) Create(u *models.Manufacturer) error {
 }
 
 // FindAll ...
-func (r *ManufacturersRepository) FindAll(page int) ([]*models.Manufacturer, error) {
+func (r *ManufacturersRepository) FindAll() ([]*models.Manufacturer, error) {
 	var m []*models.Manufacturer = make([]*models.Manufacturer, 0)
-
-	offset := (page - 1) * 50
-	limit := 50
 
 	rows, err := r.store.db.Query(
 		context.Background(),
-		`SELECT id, name, description FROM manufacturers OFFSET $1 LIMIT $2`,
-		offset,
-		limit,
+		`SELECT id, name, description FROM manufacturers`,
 	)
 	if err != nil {
 		return nil, err

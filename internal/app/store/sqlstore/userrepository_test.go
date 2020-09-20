@@ -83,12 +83,12 @@ func TestUserRepository_Update(t *testing.T) {
 	assert.NotNil(t, u.ID)
 
 	newU := &models.User{
-		FirstName:   "Test1",
-		LastName:    "Test1",
-		ThirdName:   "Test1",
-		AccessLevel: 2,
-		Email:       "dd@yandex.ru",
-		Login:       "TestLogin",
+		FirstName:     "Test1",
+		LastName:      "Test1",
+		ThirdName:     "Test1",
+		AccessLevelID: 2,
+		Email:         "dd@yandex.ru",
+		Login:         "TestLogin",
 	}
 	assert.NoError(t, s.User().Update(u.ID, newU))
 	assert.Equal(t, newU.FirstName, "Test1")

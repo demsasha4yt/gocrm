@@ -40,7 +40,7 @@ type CustomersRepository interface {
 // ManufacturersRepository interface
 type ManufacturersRepository interface {
 	Create(*models.Manufacturer) error
-	FindAll(int) ([]*models.Manufacturer, error)
+	FindAll() ([]*models.Manufacturer, error)
 	Find(int) (*models.Manufacturer, error)
 	Delete(int) error
 	Update(int, *models.Manufacturer) error

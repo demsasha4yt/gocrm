@@ -58,6 +58,7 @@ func (s *server) panicMiddleware(next http.Handler) http.Handler {
 			if err := recover(); err != nil {
 				s.logger.Error(err)
 				s.error(w, r, http.StatusInternalServerError, nil)
+				return
 			}
 		}()
 		next.ServeHTTP(w, r)

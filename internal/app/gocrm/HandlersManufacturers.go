@@ -16,10 +16,6 @@ func (s *server) handleManufacturersCreate() http.HandlerFunc {
 		Units       []int  `json:"units"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !s.checkUserAccessRights(r.Context(), models.UserAccessAdmin) {
-			s.error(w, r, http.StatusUnauthorized, errHasNoRights)
-			return
-		}
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
@@ -42,16 +38,7 @@ func (s *server) handleManufacturersCreate() http.HandlerFunc {
 
 func (s *server) handleManufacturersGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !s.checkUserAccessRights(r.Context(), models.UserAccessManager) {
-			s.error(w, r, http.StatusUnauthorized, errHasNoRights)
-			return
-		}
-		// TODO: page pagination
-		page, err := strconv.Atoi(r.FormValue("page"))
-		if err != nil {
-			s.error(w, r, http.StatusUnprocessableEntity, err)
-		}
-		manufacturers, err := s.store.Manufacturers().FindAll(page)
+		manufacturers, err := s.store.Manufacturers().FindAll()
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
@@ -62,10 +49,6 @@ func (s *server) handleManufacturersGet() http.HandlerFunc {
 
 func (s *server) handleManufacturersFind() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !s.checkUserAccessRights(r.Context(), models.UserAccessManager) {
-			s.error(w, r, http.StatusUnauthorized, errHasNoRights)
-			return
-		}
 		id, err := strconv.Atoi(mux.Vars(r)["id"])
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
@@ -87,10 +70,6 @@ func (s *server) handleManufacturersUpdate() http.HandlerFunc {
 		Units       []int  `json:"units"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !s.checkUserAccessRights(r.Context(), models.UserAccessAdmin) {
-			s.error(w, r, http.StatusUnauthorized, errHasNoRights)
-			return
-		}
 		id, err := strconv.Atoi(mux.Vars(r)["id"])
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
@@ -117,10 +96,6 @@ func (s *server) handleManufacturersUpdate() http.HandlerFunc {
 
 func (s *server) handleManufacturersDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !s.checkUserAccessRights(r.Context(), models.UserAccessAdmin) {
-			s.error(w, r, http.StatusUnauthorized, errHasNoRights)
-			return
-		}
 		id, err := strconv.Atoi(mux.Vars(r)["id"])
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)

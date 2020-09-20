@@ -31,10 +31,11 @@ type User struct {
 	FirstName         interface{} `json:"first_name,omitempty"`
 	LastName          interface{} `json:"last_name,omitempty"`
 	ThirdName         interface{} `json:"third_name,omitempty"`
-	AccessLevel       int         `json:"access_level,omitempty"`
+	AccessLevelID     int         `json:"access_level,omitempty"`
 	LastLogin         int         `json:"last_login,omitempty"`
 	CreatedAt         int         `json:"created_at,omitempty"`
 	Units             []*Unit     `json:"units,omitempty"`
+	AccessLevel       AccessLevel `json:"permissions,omitempty"`
 }
 
 // Validate validates User structure
@@ -61,7 +62,7 @@ func (u *User) BeforeCreate() error {
 		}
 		u.EncryptedPassword = enc
 	}
-	u.AccessLevel = 1
+	u.AccessLevelID = 1
 	return nil
 }
 
@@ -90,25 +91,25 @@ func encryptString(password string) (string, error) {
 
 // HasAccessRight check is user has accessRight level
 func (u *User) HasAccessRight(right int) bool {
-	return u.AccessLevel >= right
+	return u.AccessLevelID >= right
 }
 
 // IsManager check is user has manager access level
 func (u *User) IsManager() bool {
-	return u.AccessLevel >= UserAccessManager
+	return u.AccessLevelID >= UserAccessManager
 }
 
 // IsDirector checks is user has Director access level
 func (u *User) IsDirector() bool {
-	return u.AccessLevel >= UserAccessDirector
+	return u.AccessLevelID >= UserAccessDirector
 }
 
 // IsRRS checks is user has RRS access level
 func (u *User) IsRRS() bool {
-	return u.AccessLevel >= UserAccessRRS
+	return u.AccessLevelID >= UserAccessRRS
 }
 
 // IsAdmin checks is user has admin access level
 func (u *User) IsAdmin() bool {
-	return u.AccessLevel >= UserAccessAdmin
+	return u.AccessLevelID >= UserAccessAdmin
 }

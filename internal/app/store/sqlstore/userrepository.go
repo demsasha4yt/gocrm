@@ -31,7 +31,7 @@ func (r *UserRepository) Create(u *models.User) error {
 		u.Email,
 		u.Login,
 		u.EncryptedPassword,
-		u.AccessLevel,
+		u.AccessLevelID,
 	).Scan(&u.ID)
 }
 
@@ -58,7 +58,7 @@ func (r *UserRepository) Find(id int) (*models.User, error) {
 		&u.FirstName,
 		&u.LastName,
 		&u.ThirdName,
-		&u.AccessLevel,
+		&u.AccessLevelID,
 		&units,
 	); err != nil {
 		if err == sql.ErrNoRows {
@@ -77,15 +77,18 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 	u := &models.User{}
 
 	var units []byte
+	var accessLevel []byte
 	if err := r.store.db.QueryRow(
 		context.Background(),
 		`SELECT users.id, users.login, users.password, users.email, users.first_name, users.last_name, users.third_name, users.access_level, 
-			COALESCE(json_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units
+		COALESCE(json_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units,
+		json_agg(al) as access_level
 		FROM users
 		LEFT JOIN users_units uu ON uu.user_id = users.id
 		LEFT JOIN units ON units.id = uu.unit_id
-		WHERE users.email = $1
-		GROUP BY users.id`,
+		LEFT JOIN access_levels al ON al.id = users.access_level
+		WHERE users.id = $1
+		GROUP BY users.id, al.id`,
 		email,
 	).Scan(
 		&u.ID,
@@ -95,8 +98,9 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 		&u.FirstName,
 		&u.LastName,
 		&u.ThirdName,
-		&u.AccessLevel,
+		&u.AccessLevelID,
 		&units,
+		&accessLevel,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
@@ -104,6 +108,9 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 		return nil, err
 	}
 	if err := json.Unmarshal(units, &u.Units); err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(accessLevel, &u.AccessLevel); err != nil {
 		return nil, err
 	}
 	return u, nil
@@ -132,7 +139,7 @@ func (r *UserRepository) FindByLogin(login string) (*models.User, error) {
 		&u.FirstName,
 		&u.LastName,
 		&u.ThirdName,
-		&u.AccessLevel,
+		&u.AccessLevelID,
 		&units,
 	); err != nil {
 		fmt.Printf("%+v", err)
@@ -183,8 +190,8 @@ func (r *UserRepository) Update(id int, u *models.User) error {
 	if u.ThirdName != "" {
 		userDetails.ThirdName = u.ThirdName
 	}
-	if u.AccessLevel != 0 {
-		userDetails.AccessLevel = u.AccessLevel
+	if u.AccessLevelID != 0 {
+		userDetails.AccessLevelID = u.AccessLevelID
 	}
 
 	_, err = r.store.db.Exec(
@@ -196,7 +203,7 @@ func (r *UserRepository) Update(id int, u *models.User) error {
 		userDetails.FirstName,
 		userDetails.LastName,
 		userDetails.ThirdName,
-		userDetails.AccessLevel,
+		userDetails.AccessLevelID,
 		userDetails.ID,
 	)
 	if err != nil {

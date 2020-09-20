@@ -35,11 +35,6 @@ func (s *server) handleCategoriesCreate() http.HandlerFunc {
 
 func (s *server) handleCategoriesGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !s.checkUserAccessRights(r.Context(), models.UserAccessManager) {
-			s.error(w, r, http.StatusUnauthorized, errHasNoRights)
-			return
-		}
-		// TODO: page pagination
 		categories, err := s.store.Categories().FindAll()
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)

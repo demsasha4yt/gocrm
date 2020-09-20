@@ -37,7 +37,7 @@ func TestManufacturers_FindAll(t *testing.T) {
 	assert.NoError(t, s.Manufacturers().Create(m))
 	assert.NotEqual(t, m.ID, 0)
 
-	r, err := s.Manufacturers().FindAll(1)
+	r, err := s.Manufacturers().FindAll()
 	assert.NoError(t, err)
 	assert.NotNil(t, r)
 }

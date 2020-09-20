@@ -40,7 +40,7 @@ CREATE TABLE categories_units (
 			FOREIGN KEY(category_id)
 					REFERENCES categories(id)
 						ON DELETE CASCADE,
-		CONSTRAINT fk_inits
+		CONSTRAINT fk_units
 			FOREIGN KEY(unit_id)
 					REFERENCES units(id)
 						ON DELETE CASCADE,
@@ -60,6 +60,21 @@ CREATE TABLE products (
 		FOREIGN KEY(manufacturer_id)
 				REFERENCES manufacturers(id)
 					ON DELETE CASCADE
+);
+
+CREATE TABLE products_units (
+	id BIGSERIAL PRIMARY KEY,
+	product_id BIGINT,
+	unit_id BIGINT,
+	CONSTRAINT fk_products
+		FOREIGN KEY(product_id)
+				REFERENCES products(id)
+					ON DELETE CASCADE,
+	CONSTRAINT fk_units
+		FOREIGN KEY(unit_id)
+				REFERENCES units(id)
+					ON DELETE CASCADE,
+		UNIQUE(product_id, unit_id)
 );
 
 CREATE TABLE products_categories (

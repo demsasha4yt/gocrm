@@ -1,14 +1,11 @@
 package gocrm
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"net/http"
 
-	"github.com/demsasha4yt/gocrm.git/internal/app/models"
 	"github.com/demsasha4yt/gocrm.git/internal/app/store"
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/sirupsen/logrus"
@@ -53,69 +50,77 @@ func newServer(store store.Store, sessionStore sessions.Store) *server {
 		sessionStore: sessionStore,
 	}
 
-	s.configureRouter()
+	s.configureRouter(s.router, s.registerRouters())
 	s.logger.Info("Server started.")
 	return s
 }
 
-func (s *server) configureRouter() {
-	// Some middlewares
-	s.router.Use(s.setRequestID)
-	s.router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*"})))
-	s.router.Use(s.accessLogMiddleware)
-	s.router.Use(s.panicMiddleware)
-
-	api := s.router.PathPrefix("/api").Subrouter()
-	api.Use(s.authMiddleware)
-
-	// Auth ...
-	s.router.HandleFunc("/sign_in", s.handleSignIn()).Methods("POST")
-	s.router.HandleFunc("/logout", s.handleLogout()).Methods("POST")
-	api.HandleFunc("/info", s.handleWhoAmI()).Methods("GET")
-
-	// /api/users/**
-	api.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
-	api.HandleFunc("/users", s.handleUsersGet()).Methods("GET")
-	api.HandleFunc("/users/{id:[0-9]+}", s.handleUsersFind()).Methods("GET")
-	api.HandleFunc("/users/{id:[0-9]+}", s.handleUsersUpdate()).Methods("PUT")
-	api.HandleFunc("/users/{id:[0-9]+}", s.handleUsersDelete()).Methods("DELETE")
-
-	// /api/units/**
-	api.HandleFunc("/units", s.handleUnitsCreate()).Methods("POST")
-	api.HandleFunc("/units", s.handleUnitsGet()).Methods("GET")
-	api.HandleFunc("/units/{id:[0-9]+}", s.handleUnitsFind()).Methods("GET")
-	api.HandleFunc("/units/{id:[0-9]+}", s.handleUnitsUpdate()).Methods("PUT")
-	api.HandleFunc("/units/{id:[0-9]+}", s.handleUnitsDelete()).Methods("DELETE")
-
-	// /api/manufacturers
-	api.HandleFunc("/manufacturers", s.handleManufacturersCreate()).Methods("POST")
-	api.HandleFunc("/manufacturers", s.handleManufacturersGet()).Methods("GET").Queries("page", "{page}")
-	api.HandleFunc("/manufacturers/{id:[0-9]+}", s.handleManufacturersFind()).Methods("GET")
-	api.HandleFunc("/manufacturers/{id:[0-9]+}", s.handleManufacturersUpdate()).Methods("PUT")
-	api.HandleFunc("/manufacturers/{id:[0-9]+}", s.handleManufacturersDelete()).Methods("DELETE")
-
-	// /api/categorues
-	api.HandleFunc("/categories", s.handleCategoriesCreate()).Methods("POST")
-	api.HandleFunc("/categories", s.handleCategoriesGet()).Methods("GET")
-	api.HandleFunc("/categories/{id:[0-9]+}", s.handleCategoriesFind()).Methods("GET")
-	api.HandleFunc("/categories/{id:[0-9]+}", s.handleCategoriesUpdate()).Methods("PUT")
-	api.HandleFunc("/categories/{id:[0-9]+}", s.handleCategoriesDelete()).Methods("DELETE")
-
-	// Serve static files for SPA
-	spa := &spaHandler{staticPath: "ui/dist", indexPath: "index.html"}
-	s.router.PathPrefix("/").Handler(spa)
-
-	// Check Api Health handler
-	s.router.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
-		s.respond(w, r, http.StatusOK, map[string]bool{"ok": true})
-	})
-}
-
-// checkUserAccessRights checks if user has accessright
-func (s *server) checkUserAccessRights(ctx context.Context, accessRight int) bool {
-	u, ok := ctx.Value(ctxKeyUser).(*models.User)
-	if !ok {
-		return false
+func (s *server) configureRouter(router *mux.Router, subrouter *Router) {
+	r := router.PathPrefix(subrouter.PathPrefix).Subrouter()
+	for _, middleware := range subrouter.middlewares {
+		r.Use(mux.MiddlewareFunc(middleware))
 	}
-	return u.HasAccessRight(accessRight)
+	for _, route := range subrouter.Routes {
+		s.logger.Infof("%s route loaded, pattern %s", route.Name, route.Pattern)
+		// TODO: Wrap handler in AccessMidlewares
+		r.HandleFunc(route.Pattern, route.Handler()).Methods(route.Method)
+	}
+	for _, sub := range subrouter.Subrouters {
+		s.configureRouter(r, sub)
+	}
+	s.logger.Infof("%s router loaded", subrouter.Name)
 }
+
+// func (s *server) configureRouter() {
+// 	// Some middlewares
+// 	s.router.Use(s.setRequestID)
+// 	s.router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*"})))
+// 	s.router.Use(s.accessLogMiddleware)
+// 	s.router.Use(s.panicMiddleware)
+
+// 	api := s.router.PathPrefix("/api").Subrouter()
+// 	api.Use(s.authMiddleware)
+// 	// accessRouters := make([]*mux.Router, 0)
+
+// 	// Auth ...
+// 	s.router.HandleFunc("/sign_in", s.handleSignIn()).Methods("POST")
+// 	s.router.HandleFunc("/logout", s.handleLogout()).Methods("POST")
+// 	api.HandleFunc("/info", s.handleWhoAmI()).Methods("GET")
+
+// 	// /api/users/**
+// 	api.HandleFunc("/users", s.handleUsersCreate()).Methods("POST", "OPTIONS")
+// 	api.HandleFunc("/users", s.handleUsersGet()).Methods("GET", "OPTIONS")
+// 	api.HandleFunc("/users/{id:[0-9]+}", s.handleUsersFind()).Methods("GET", "OPTIONS")
+// 	api.HandleFunc("/users/{id:[0-9]+}", s.handleUsersUpdate()).Methods("PUT", "OPTIONS")
+// 	api.HandleFunc("/users/{id:[0-9]+}", s.handleUsersDelete()).Methods("DELETE", "OPTIONS")
+
+// 	// /api/units/**
+// 	api.HandleFunc("/units", s.handleUnitsCreate()).Methods("POST", "OPTIONS")
+// 	api.HandleFunc("/units", s.handleUnitsGet()).Methods("GET", "OPTIONS")
+// 	api.HandleFunc("/units/{id:[0-9]+}", s.handleUnitsFind()).Methods("GET", "OPTIONS")
+// 	api.HandleFunc("/units/{id:[0-9]+}", s.handleUnitsUpdate()).Methods("PUT", "OPTIONS")
+// 	api.HandleFunc("/units/{id:[0-9]+}", s.handleUnitsDelete()).Methods("DELETE", "OPTIONS")
+
+// 	// /api/manufacturers
+// 	api.HandleFunc("/manufacturers", s.handleManufacturersCreate()).Methods("POST", "OPTIONS")
+// 	api.HandleFunc("/manufacturers", s.handleManufacturersGet()).Methods("GET", "OPTIONS").Queries("page", "{page}")
+// 	api.HandleFunc("/manufacturers/{id:[0-9]+}", s.handleManufacturersFind()).Methods("GET", "OPTIONS")
+// 	api.HandleFunc("/manufacturers/{id:[0-9]+}", s.handleManufacturersUpdate()).Methods("PUT", "OPTIONS")
+// 	api.HandleFunc("/manufacturers/{id:[0-9]+}", s.handleManufacturersDelete()).Methods("DELETE", "OPTIONS")
+
+// 	// /api/categorues
+// 	api.HandleFunc("/categories", s.handleCategoriesCreate()).Methods("POST", "OPTIONS")
+// 	api.HandleFunc("/categories", s.handleCategoriesGet()).Methods("GET", "OPTIONS")
+// 	api.HandleFunc("/categories/{id:[0-9]+}", s.handleCategoriesFind()).Methods("GET", "OPTIONS")
+// 	api.HandleFunc("/categories/{id:[0-9]+}", s.handleCategoriesUpdate()).Methods("PUT", "OPTIONS")
+// 	api.HandleFunc("/categories/{id:[0-9]+}", s.handleCategoriesDelete()).Methods("DELETE", "OPTIONS")
+
+// 	// Serve static files for SPA
+// 	spa := &spaHandler{staticPath: "ui/dist", indexPath: "index.html"}
+// 	s.router.PathPrefix("/").Handler(spa)
+
+// 	// Check Api Health handler
+// 	s.router.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
+// 		s.respond(w, r, http.StatusOK, map[string]bool{"ok": true})
+// 	})
+// }

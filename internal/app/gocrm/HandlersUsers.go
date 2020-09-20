@@ -14,10 +14,6 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		Password string `json:"password"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !s.checkUserAccessRights(r.Context(), models.UserAccessRRS) {
-			s.error(w, r, http.StatusUnauthorized, errHasNoRights)
-			return
-		}
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
