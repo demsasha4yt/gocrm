@@ -12,12 +12,18 @@ type MiddlewareFunc func(http.Handler) http.Handler
 // MiddlewareFuncs ...
 type MiddlewareFuncs []MiddlewareFunc
 
+// AccessMiddleware ...
+type AccessMiddleware func(http.HandlerFunc) http.HandlerFunc
+
+// AccessMiddlewares ...
+type AccessMiddlewares []AccessMiddleware
+
 // Route ...
 type Route struct {
 	Name             string
 	Method           string
 	Pattern          string
-	AccessMiddleware MiddlewareFuncs
+	AccessMiddleware AccessMiddlewares
 	Handler          func() http.HandlerFunc
 }
 
@@ -51,14 +57,14 @@ func (s *server) registerRouters() *Router {
 				Name:             "Signin",
 				Method:           "POST",
 				Pattern:          "/signin",
-				AccessMiddleware: MiddlewareFuncs{s.AccessMiddleware()},
+				AccessMiddleware: AccessMiddlewares{s.AccessMiddleware()},
 				Handler:          s.handleSignIn,
 			},
 			&Route{
 				Name:             "Logout",
 				Method:           "POST",
 				Pattern:          "/logout",
-				AccessMiddleware: MiddlewareFuncs{s.AccessMiddleware()},
+				AccessMiddleware: AccessMiddlewares{s.AccessMiddleware()},
 				Handler:          s.handleLogout,
 			},
 		},
@@ -73,42 +79,42 @@ func (s *server) registerRouters() *Router {
 						Name:             "InfoAboutSession",
 						Method:           "GET",
 						Pattern:          "/info",
-						AccessMiddleware: MiddlewareFuncs{s.AccessMiddleware()},
+						AccessMiddleware: AccessMiddlewares{s.AccessMiddleware()},
 						Handler:          s.handleWhoAmI,
 					},
 					&Route{
 						Name:             "CreateUser",
 						Method:           "POST",
 						Pattern:          "/users",
-						AccessMiddleware: MiddlewareFuncs{s.AccessMiddleware(UserCreatePerm)},
+						AccessMiddleware: AccessMiddlewares{s.AccessMiddleware(UserCreatePerm)},
 						Handler:          s.handleUsersCreate,
 					},
 					&Route{
 						Name:             "GetAllUsers",
 						Method:           "GET",
 						Pattern:          "/users",
-						AccessMiddleware: MiddlewareFuncs{s.AccessMiddleware(UserGetPerm)},
+						AccessMiddleware: AccessMiddlewares{s.AccessMiddleware(UserGetPerm)},
 						Handler:          s.handleUsersGet,
 					},
 					&Route{
 						Name:             "GetAllUsers",
 						Method:           "GET",
 						Pattern:          "/users/{id:[0-9]+}",
-						AccessMiddleware: MiddlewareFuncs{s.AccessMiddleware(UserGetPerm)},
+						AccessMiddleware: AccessMiddlewares{s.AccessMiddleware(UserGetPerm)},
 						Handler:          s.handleUsersGet,
 					},
 					&Route{
 						Name:             "UpdateUserByID",
 						Method:           "PUT",
 						Pattern:          "/users/{id:[0-9]+}",
-						AccessMiddleware: MiddlewareFuncs{s.AccessMiddleware(UserUpdatePerm)},
+						AccessMiddleware: AccessMiddlewares{s.AccessMiddleware(UserUpdatePerm)},
 						Handler:          s.handleUsersUpdate,
 					},
 					&Route{
 						Name:             "DeleteUserByID",
 						Method:           "DELETE",
 						Pattern:          "/users/{id:[0-9]+}",
-						AccessMiddleware: MiddlewareFuncs{s.AccessMiddleware(UserDeletePerm)},
+						AccessMiddleware: AccessMiddlewares{s.AccessMiddleware(UserDeletePerm)},
 						Handler:          s.handleUsersDelete,
 					},
 				},

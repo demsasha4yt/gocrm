@@ -62,8 +62,10 @@ func (s *server) configureRouter(router *mux.Router, subrouter *Router) {
 	}
 	for _, route := range subrouter.Routes {
 		s.logger.Infof("%s route loaded, pattern %s", route.Name, route.Pattern)
-		// TODO: Wrap handler in AccessMidlewares
-		r.HandleFunc(route.Pattern, route.Handler()).Methods(route.Method)
+		r.HandleFunc(
+			route.Pattern,
+			s.WrapAccessMiddlwares(route.Handler(), route.AccessMiddleware),
+		).Methods(route.Method)
 	}
 	for _, sub := range subrouter.Subrouters {
 		s.configureRouter(r, sub)

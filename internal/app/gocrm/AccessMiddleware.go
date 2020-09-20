@@ -21,63 +21,63 @@ const (
 	// CategoryGetPerm ...
 	CategoryGetPerm string = "CategoryGet"
 	// CategoryUpdatePerm ...
-	CategoryUpdatePerm string = "AccessDelete"
+	CategoryUpdatePerm string = "CategoryUpdate"
 	// CategoryDeletePerm ...
-	CategoryDeletePerm string = "AccessDelete"
+	CategoryDeletePerm string = "CategoryDelete"
 	// CustomerCreatePerm ...
-	CustomerCreatePerm string = "AccessDelete"
+	CustomerCreatePerm string = "CustomerCreate"
 	// CustomerGetPerm ...
-	CustomerGetPerm string = "AccessDelete"
+	CustomerGetPerm string = "CustomerGet"
 	// CustomerUpdatePerm ...
-	CustomerUpdatePerm string = "AccessDelete"
+	CustomerUpdatePerm string = "CustomerUpdate"
 	// CustomerDeletePerm ...
-	CustomerDeletePerm string = "AccessDelete"
+	CustomerDeletePerm string = "CustomerDelete"
 	// ManufacturerCreatePerm ...
-	ManufacturerCreatePerm string = "ManufacturerDelete"
+	ManufacturerCreatePerm string = "ManufacturerCreate"
 	// ManufacturerGetPerm ...
-	ManufacturerGetPerm string = "ManufacturerDelete"
+	ManufacturerGetPerm string = "ManufacturerGet"
 	// ManufacturerUpdatePerm ...
-	ManufacturerUpdatePerm string = "ManufacturerDelete"
+	ManufacturerUpdatePerm string = "ManufacturerUpdate"
 	// ManufacturerDeletePerm ...
 	ManufacturerDeletePerm string = "ManufacturerDelete"
 	// OptionCreatePerm ...
-	OptionCreatePerm string = "OptionDelete"
+	OptionCreatePerm string = "OptionCreate"
 	// OptionGetPerm ...
-	OptionGetPerm string = "OptionDelete"
+	OptionGetPerm string = "OptionGet"
 	// OptionUpdatePerm ...
-	OptionUpdatePerm string = "OptionDelete"
+	OptionUpdatePerm string = "OptionUpdate"
 	// OptionDeletePerm ...
 	OptionDeletePerm string = "OptionDelete"
 	// OrderCreatePerm ...
-	OrderCreatePerm string = "OrderDelete"
+	OrderCreatePerm string = "OrderCreate"
 	// OrderGetPerm ...
-	OrderGetPerm string = "OrderDelete"
+	OrderGetPerm string = "OrderGet"
 	// OrderUpdatePerm ...
-	OrderUpdatePerm string = "OrderDelete"
+	OrderUpdatePerm string = "OrderUpdate"
 	// OrderDeletePerm ...
 	OrderDeletePerm string = "OrderDelete"
 	// ProductCreatePerm ...
-	ProductCreatePerm string = "ProductDelete"
+	ProductCreatePerm string = "ProductCreate"
 	// ProductGetPerm ...
-	ProductGetPerm string = "ProductDelete"
+	ProductGetPerm string = "ProductGet"
 	// ProductUpdatePerm ...
-	ProductUpdatePerm string = "ProductDelete"
+	ProductUpdatePerm string = "ProductUpdate"
 	// ProductDeletePerm ...
 	ProductDeletePerm string = "ProductDelete"
 	// UnitCreatePerm ...
-	UnitCreatePerm string = "UnitDelete"
+	UnitCreatePerm string = "UnitCreate"
 	// UnitGetPerm ...
-	UnitGetPerm string = "UnitDelete"
+	UnitGetPerm string = "UnitGet"
 	// UnitUpdatePerm ...
-	UnitUpdatePerm string = "UnitDelete"
+	UnitUpdatePerm string = "UnitUpdate"
 	// UnitDeletePerm ...
 	UnitDeletePerm string = "UnitDelete"
 	// UserCreatePerm ...
-	UserCreatePerm string = "UserDelete"
+	UserCreatePerm string = "UserCreate"
 	// UserGetPerm ...
-	UserGetPerm string = "UserDelete"
+	UserGetPerm string = "UserGet"
 	// UserUpdatePerm ...
-	UserUpdatePerm string = "UserDelete"
+	UserUpdatePerm string = "UserUpdate"
 	// UserDeletePerm ...
 	UserDeletePerm string = "UserDelete"
 )
@@ -86,8 +86,8 @@ const (
 	ACCESS MIDDLEWARES
 **/
 
-func (s *server) AccessMiddleware(access ...string) MiddlewareFunc {
-	return func(next http.Handler) http.Handler {
+func (s *server) AccessMiddleware(access ...string) AccessMiddleware {
+	return func(next http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			user, ok := r.Context().Value(ctxKeyUser).(*models.User)
 			if !ok {
@@ -109,4 +109,19 @@ func (s *server) AccessMiddleware(access ...string) MiddlewareFunc {
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func (s *server) WrapAccessMiddlwares(h http.HandlerFunc, m AccessMiddlewares) http.HandlerFunc {
+	if len(m) < 1 {
+		return h
+	}
+
+	wrapped := h
+
+	// loop in reverse to preserve middleware order
+	for i := len(m) - 1; i >= 0; i-- {
+		wrapped = m[i](wrapped)
+	}
+
+	return wrapped
 }
