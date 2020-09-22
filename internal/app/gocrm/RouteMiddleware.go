@@ -86,7 +86,7 @@ const (
 	ACCESS MIDDLEWARES
 **/
 
-func (s *server) AccessMiddleware(access ...string) AccessMiddleware {
+func (s *server) AccessMiddleware(access ...string) RouteMiddleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			user, ok := r.Context().Value(ctxKeyUser).(*models.User)
@@ -111,7 +111,7 @@ func (s *server) AccessMiddleware(access ...string) AccessMiddleware {
 	}
 }
 
-func (s *server) WrapAccessMiddlwares(h http.HandlerFunc, m AccessMiddlewares) http.HandlerFunc {
+func (s *server) WrapRouteMiddlewares(h http.HandlerFunc, m RouteMiddlewares) http.HandlerFunc {
 	if len(m) < 1 {
 		return h
 	}

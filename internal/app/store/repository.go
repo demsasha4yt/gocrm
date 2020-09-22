@@ -27,7 +27,7 @@ type UnitRepository interface {
 // CategoriesRepository interface
 type CategoriesRepository interface {
 	Create(context.Context, *models.Category) error
-	FindAll(context.Context) ([]*models.Category, error)
+	FindAll(context.Context, int, int) ([]*models.Category, error)
 	Find(context.Context, int) (*models.Category, error)
 	Delete(context.Context, int) error
 	Update(context.Context, int, *models.Category) error
@@ -44,7 +44,7 @@ type CustomersRepository interface {
 // ManufacturersRepository interface
 type ManufacturersRepository interface {
 	Create(context.Context, *models.Manufacturer) error
-	FindAll(context.Context) ([]*models.Manufacturer, error)
+	FindAll(context.Context, int, int) ([]*models.Manufacturer, error)
 	Find(context.Context, int) (*models.Manufacturer, error)
 	Delete(context.Context, int) error
 	Update(context.Context, int, *models.Manufacturer) error

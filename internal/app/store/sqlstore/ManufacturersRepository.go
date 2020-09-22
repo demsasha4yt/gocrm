@@ -51,12 +51,14 @@ func (r *ManufacturersRepository) Create(ctx context.Context, u *models.Manufact
 }
 
 // FindAll ...
-func (r *ManufacturersRepository) FindAll(ctx context.Context) ([]*models.Manufacturer, error) {
+func (r *ManufacturersRepository) FindAll(ctx context.Context, offset, limit int) ([]*models.Manufacturer, error) {
 	var m []*models.Manufacturer = make([]*models.Manufacturer, 0)
 
 	rows, err := r.store.db.Query(
 		ctx,
-		`SELECT id, name, description FROM manufacturers`,
+		`SELECT id, name, description FROM manufacturers OFFSET $1 LIMIT $2`,
+		offset,
+		limit,
 	)
 	if err != nil {
 		return nil, err

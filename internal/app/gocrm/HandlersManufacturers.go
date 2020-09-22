@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/demsasha4yt/gocrm.git/internal/app/models"
+	"github.com/demsasha4yt/gocrm.git/internal/app/pagination"
 	"github.com/gorilla/mux"
 )
 
@@ -38,7 +39,8 @@ func (s *server) handleManufacturersCreate() http.HandlerFunc {
 
 func (s *server) handleManufacturersGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		manufacturers, err := s.store.Manufacturers().FindAll(r.Context())
+		pages := pagination.NewFromRequest(r, -1)
+		manufacturers, err := s.store.Manufacturers().FindAll(r.Context(), pages.Offset(), pages.Limit())
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return

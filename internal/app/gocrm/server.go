@@ -16,6 +16,7 @@ type ctxKey int8
 const (
 	ctxKeyUser ctxKey = iota
 	ctxKeyRequestID
+	ctxKeyListParams
 )
 
 const (
@@ -27,6 +28,8 @@ var (
 	errNotAuthorized           = errors.New("Вы не авторизованы")
 	errHasNoRights             = errors.New("Вы не можете этого сделать")
 	errNoImplemented           = errors.New("Not implemented")
+	errWrongPageParameter      = errors.New("Wrong Page parameter")
+	errWrongPageSizeParameter  = errors.New("Wrong PageSize parameter")
 )
 
 // Server is a main structure
@@ -64,7 +67,7 @@ func (s *server) configureRouter(router *mux.Router, subrouter *Router) {
 		s.logger.Infof("%s route loaded, pattern %s", route.Name, route.Pattern)
 		r.HandleFunc(
 			route.Pattern,
-			s.WrapAccessMiddlwares(route.Handler(), route.AccessMiddleware),
+			s.WrapRouteMiddlewares(route.Handler(), route.RouteMiddlewares),
 		).Methods(route.Method)
 	}
 	for _, sub := range subrouter.Subrouters {

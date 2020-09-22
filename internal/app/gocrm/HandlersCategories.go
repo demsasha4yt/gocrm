@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/demsasha4yt/gocrm.git/internal/app/models"
+	"github.com/demsasha4yt/gocrm.git/internal/app/pagination"
 	"github.com/guregu/null"
 )
 
@@ -35,7 +36,8 @@ func (s *server) handleCategoriesCreate() http.HandlerFunc {
 
 func (s *server) handleCategoriesGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		categories, err := s.store.Categories().FindAll(r.Context())
+		pages := pagination.NewFromRequest(r, -1)
+		categories, err := s.store.Categories().FindAll(r.Context(), pages.Offset(), pages.Limit())
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return

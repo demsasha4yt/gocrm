@@ -29,7 +29,7 @@ func (r *CategoriesRepository) Create(ctx context.Context, u *models.Category) e
 }
 
 // FindAll ...
-func (r *CategoriesRepository) FindAll(ctx context.Context) ([]*models.Category, error) {
+func (r *CategoriesRepository) FindAll(ctx context.Context, offset, limit int) ([]*models.Category, error) {
 	var categories []*models.Category = make([]*models.Category, 0)
 
 	rows, err := r.store.db.Query(
@@ -38,7 +38,10 @@ func (r *CategoriesRepository) FindAll(ctx context.Context) ([]*models.Category,
 		COALESCE(jsonb_agg(cc) FILTER (WHERE cc.id IS NOT NULL), '[]') AS subcategories
 		FROM categories c
 		LEFT JOIN categories cc ON cc.parent_id = c.id
-		GROUP BY c.id`,
+		GROUP BY c.id
+		OFFSET $1 LIMIT $2`,
+		offset,
+		limit,
 	)
 	if err != nil {
 		return nil, err
