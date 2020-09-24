@@ -134,7 +134,7 @@ func (r *UserRepository) FindByLogin(ctx context.Context, login string) (*models
 	if err := r.store.db.QueryRow(
 		ctx,
 		`SELECT users.id, users.login, users.password, users.email, users.first_name, users.last_name, users.third_name, users.access_level, 
-			COALESCE(json_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units
+			COALESCE(jsonb_agg(units) FILTER (WHERE units.id IS NOT NULL), '[]') AS units
 		FROM users
 		LEFT JOIN users_units uu ON uu.user_id = users.id
 		LEFT JOIN units ON units.id = uu.unit_id
