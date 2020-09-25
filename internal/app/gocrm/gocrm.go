@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/demsasha4yt/gocrm.git/internal/app/service"
 	"github.com/demsasha4yt/gocrm.git/internal/app/store/sqlstore"
 	"github.com/gorilla/sessions"
 	"github.com/jackc/pgx"
@@ -26,8 +27,8 @@ func Start(config *Config) error {
 
 	store := sqlstore.New(db)
 	sessionStore := sessions.NewCookieStore([]byte(config.SessionKey))
-
-	srv := newServer(store, sessionStore)
+	service := service.New(store)
+	srv := newServer(store, sessionStore, service)
 
 	return http.ListenAndServe(config.BindAddr, srv)
 }

@@ -16,9 +16,6 @@ type ManufacturersRepository struct {
 
 // Create ...
 func (r *ManufacturersRepository) Create(ctx context.Context, u *models.Manufacturer) error {
-	if err := u.Validate(); err != nil {
-		return err
-	}
 	tx, err := r.store.db.Begin(ctx)
 	if err != nil {
 		return err
@@ -120,9 +117,6 @@ func (r *ManufacturersRepository) Delete(ctx context.Context, id int) error {
 
 // Update ...
 func (r *ManufacturersRepository) Update(ctx context.Context, id int, u *models.Manufacturer) error {
-	if err := u.Validate(); err != nil {
-		return err
-	}
 	manufacturerDetails, err := r.Find(ctx, id)
 	if err != nil {
 		return store.ErrRecordNotFound

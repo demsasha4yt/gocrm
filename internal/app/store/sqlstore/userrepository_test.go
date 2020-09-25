@@ -15,7 +15,7 @@ func TestUserRepository_Create(t *testing.T) {
 
 	s := sqlstore.New(db)
 	u := models.TestUser(t)
-	assert.NoError(t, s.User().Create(context.Background(), u))
+	assert.NoError(t, s.Users().Create(context.Background(), u))
 	assert.NotNil(t, u.ID)
 }
 
@@ -25,8 +25,8 @@ func TestUserRepository_Find(t *testing.T) {
 
 	s := sqlstore.New(db)
 	u1 := models.TestUser(t)
-	s.User().Create(context.Background(), u1)
-	u2, err := s.User().Find(context.Background(), u1.ID)
+	s.Users().Create(context.Background(), u1)
+	u2, err := s.Users().Find(context.Background(), u1.ID)
 	assert.NoError(t, err)
 	assert.NotNil(t, u2)
 }
@@ -37,11 +37,11 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 
 	s := sqlstore.New(db)
 	u1 := models.TestUser(t)
-	_, err := s.User().FindByEmail(context.Background(), u1.Email)
+	_, err := s.Users().FindByEmail(context.Background(), u1.Email)
 	assert.Error(t, err)
 
-	s.User().Create(context.Background(), u1)
-	u2, err := s.User().FindByEmail(context.Background(), u1.Email)
+	s.Users().Create(context.Background(), u1)
+	u2, err := s.Users().FindByEmail(context.Background(), u1.Email)
 	assert.NoError(t, err)
 	assert.NotNil(t, u2)
 }
@@ -52,11 +52,11 @@ func TestUserRepository_FindByLogin(t *testing.T) {
 
 	s := sqlstore.New(db)
 	u1 := models.TestUser(t)
-	_, err := s.User().FindByLogin(context.Background(), u1.Login)
+	_, err := s.Users().FindByLogin(context.Background(), u1.Login)
 	assert.Error(t, err)
 
-	s.User().Create(context.Background(), u1)
-	u2, err := s.User().FindByLogin(context.Background(), u1.Login)
+	s.Users().Create(context.Background(), u1)
+	u2, err := s.Users().FindByLogin(context.Background(), u1.Login)
 	assert.NoError(t, err)
 	assert.NotNil(t, u2)
 }
@@ -66,10 +66,10 @@ func TestUserRepository_Delete(t *testing.T) {
 	defer teardown()
 
 	s := sqlstore.New(db)
-	err := s.User().Delete(context.Background(), 100)
+	err := s.Users().Delete(context.Background(), 100)
 	assert.NoError(t, err)
 
-	u, _ := s.User().Find(context.Background(), 100)
+	u, _ := s.Users().Find(context.Background(), 100)
 	assert.Nil(t, u)
 }
 
@@ -80,7 +80,7 @@ func TestUserRepository_Update(t *testing.T) {
 	s := sqlstore.New(db)
 	u := models.TestUser(t)
 
-	assert.NoError(t, s.User().Create(context.Background(), u))
+	assert.NoError(t, s.Users().Create(context.Background(), u))
 	assert.NotNil(t, u.ID)
 
 	newU := &models.User{
@@ -91,7 +91,7 @@ func TestUserRepository_Update(t *testing.T) {
 		Email:         "dd@yandex.ru",
 		Login:         "TestLogin",
 	}
-	assert.NoError(t, s.User().Update(context.Background(), u.ID, newU))
+	assert.NoError(t, s.Users().Update(context.Background(), u.ID, newU))
 	assert.Equal(t, newU.FirstName, "Test1")
 	assert.Equal(t, newU.LastName, "Test1")
 	assert.Equal(t, newU.ThirdName, "Test1")
@@ -99,7 +99,7 @@ func TestUserRepository_Update(t *testing.T) {
 	assert.Equal(t, newU.Login, "TestLogin")
 	assert.Equal(t, newU.Email, "dd@yandex.ru")
 
-	user, err := s.User().Find(context.Background(), u.ID)
+	user, err := s.Users().Find(context.Background(), u.ID)
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 	assert.Equal(t, user.FirstName, "Test1")

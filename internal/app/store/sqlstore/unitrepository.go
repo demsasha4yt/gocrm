@@ -8,16 +8,13 @@ import (
 	"github.com/demsasha4yt/gocrm.git/internal/app/store"
 )
 
-// UnitRepository is a repository for units
-type UnitRepository struct {
+// UnitsRepository is a repository for units
+type UnitsRepository struct {
 	store *Store
 }
 
 // Create ..
-func (r *UnitRepository) Create(ctx context.Context, u *models.Unit) error {
-	if err := u.Validate(); err != nil {
-		return err
-	}
+func (r *UnitsRepository) Create(ctx context.Context, u *models.Unit) error {
 	return r.store.db.QueryRow(ctx, "INSERT INTO units(name, address) VALUES($1, $2) RETURNING id",
 		u.Name,
 		u.Address,
@@ -25,7 +22,7 @@ func (r *UnitRepository) Create(ctx context.Context, u *models.Unit) error {
 }
 
 // Find ...
-func (r *UnitRepository) Find(ctx context.Context, id int) (*models.Unit, error) {
+func (r *UnitsRepository) Find(ctx context.Context, id int) (*models.Unit, error) {
 	u := &models.Unit{}
 	if err := r.store.db.QueryRow(
 		ctx,
@@ -45,7 +42,7 @@ func (r *UnitRepository) Find(ctx context.Context, id int) (*models.Unit, error)
 }
 
 // Delete ..
-func (r *UnitRepository) Delete(ctx context.Context, id int) error {
+func (r *UnitsRepository) Delete(ctx context.Context, id int) error {
 	_, err := r.store.db.Exec(ctx, "DELETE FROM units WHERE id=$1", id)
 	if err != nil {
 		return err
@@ -54,10 +51,7 @@ func (r *UnitRepository) Delete(ctx context.Context, id int) error {
 }
 
 // Update ...
-func (r *UnitRepository) Update(ctx context.Context, id int, u *models.Unit) error {
-	if err := u.Validate(); err != nil {
-		return err
-	}
+func (r *UnitsRepository) Update(ctx context.Context, id int, u *models.Unit) error {
 	unitDetails, err := r.Find(ctx, id)
 	if err != nil {
 		return store.ErrRecordNotFound

@@ -16,9 +16,6 @@ type CategoriesRepository struct {
 
 // Create ...
 func (r *CategoriesRepository) Create(ctx context.Context, u *models.Category) error {
-	if err := u.Validate(); err != nil {
-		return err
-	}
 	return r.store.db.QueryRow(
 		ctx,
 		"INSERT INTO categories (name, description, parent_id) VALUES ($1, $2, $3) RETURNING id",
@@ -111,9 +108,6 @@ func (r *CategoriesRepository) Delete(ctx context.Context, id int) error {
 
 // Update ...
 func (r *CategoriesRepository) Update(ctx context.Context, id int, u *models.Category) error {
-	if err := u.Validate(); err != nil {
-		return err
-	}
 	categoryDetails, err := r.Find(ctx, id)
 	if err != nil {
 		return store.ErrRecordNotFound

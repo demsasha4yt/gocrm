@@ -29,7 +29,7 @@ func (s *server) handleManufacturersCreate() http.HandlerFunc {
 		for _, unitID := range req.Units {
 			u.Units = append(u.Units, &models.Unit{ID: unitID})
 		}
-		if err := s.store.Manufacturers().Create(r.Context(), u); err != nil {
+		if err := s.service.Manufacturers().Create(r.Context(), u); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
@@ -40,7 +40,7 @@ func (s *server) handleManufacturersCreate() http.HandlerFunc {
 func (s *server) handleManufacturersGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		pages := pagination.NewFromRequest(r, -1)
-		manufacturers, err := s.store.Manufacturers().FindAll(r.Context(), pages.Offset(), pages.Limit())
+		manufacturers, err := s.service.Manufacturers().FindAll(r.Context(), pages.Offset(), pages.Limit())
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
@@ -56,7 +56,7 @@ func (s *server) handleManufacturersFind() http.HandlerFunc {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-		manufacturer, err := s.store.Manufacturers().Find(r.Context(), id)
+		manufacturer, err := s.service.Manufacturers().Find(r.Context(), id)
 		if err != nil {
 			s.error(w, r, http.StatusNotFound, err)
 			return
@@ -89,8 +89,9 @@ func (s *server) handleManufacturersUpdate() http.HandlerFunc {
 		for _, unitID := range req.Units {
 			u.Units = append(u.Units, &models.Unit{ID: unitID})
 		}
-		if err := s.store.Manufacturers().Update(r.Context(), id, u); err != nil {
+		if err := s.service.Manufacturers().Update(r.Context(), id, u); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
 		}
 		s.respond(w, r, http.StatusOK, u)
 	}
@@ -103,8 +104,9 @@ func (s *server) handleManufacturersDelete() http.HandlerFunc {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-		if err := s.store.Manufacturers().Delete(r.Context(), id); err != nil {
+		if err := s.service.Manufacturers().Delete(r.Context(), id); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
 		}
 		s.respond(w, r, http.StatusOK, "OK")
 	}

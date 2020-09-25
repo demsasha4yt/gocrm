@@ -24,7 +24,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 			Login:    req.Login,
 			Password: req.Password,
 		}
-		if err := s.store.User().Create(r.Context(), u); err != nil {
+		if err := s.service.Users().Create(r.Context(), u); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}

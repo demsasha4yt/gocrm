@@ -17,8 +17,8 @@ type Store struct {
 	optionsValuesRepository *OptionsValuesRepository
 	ordersRepository        *OrdersRepository
 	productsRepository      *ProductsRepository
-	unitRepository          *UnitRepository
-	userRepository          *UserRepository
+	unitsRepository         *UnitsRepository
+	usersRepository         *UsersRepository
 	variationsRepository    *VariationsRepository
 }
 
@@ -146,30 +146,30 @@ func (s *Store) Products() store.ProductsRepository {
 	return s.productsRepository
 }
 
-// Unit returns unitRepository
-func (s *Store) Unit() store.UnitRepository {
-	if s.unitRepository != nil {
-		return s.unitRepository
+// Units returns unitRepository
+func (s *Store) Units() store.UnitsRepository {
+	if s.unitsRepository != nil {
+		return s.unitsRepository
 	}
 
-	s.unitRepository = &UnitRepository{
+	s.unitsRepository = &UnitsRepository{
 		store: s,
 	}
 
-	return s.unitRepository
+	return s.unitsRepository
 }
 
-// User returns userRepository
-func (s *Store) User() store.UserRepository {
-	if s.userRepository != nil {
-		return s.userRepository
+// Users returns userRepository
+func (s *Store) Users() store.UsersRepository {
+	if s.usersRepository != nil {
+		return s.usersRepository
 	}
 
-	s.userRepository = &UserRepository{
+	s.usersRepository = &UsersRepository{
 		store: s,
 	}
 
-	return s.userRepository
+	return s.usersRepository
 }
 
 // Variations returns VariationsRepository

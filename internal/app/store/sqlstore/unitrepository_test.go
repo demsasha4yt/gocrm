@@ -15,7 +15,7 @@ func TestUnitRepository_Create(t *testing.T) {
 
 	s := sqlstore.New(db)
 	u := models.TestUnit(t)
-	assert.NoError(t, s.Unit().Create(context.Background(), u))
+	assert.NoError(t, s.Units().Create(context.Background(), u))
 	assert.NotNil(t, u.ID)
 }
 
@@ -26,9 +26,9 @@ func TestUnitRepository_Find(t *testing.T) {
 	s := sqlstore.New(db)
 
 	u := models.TestUnit(t)
-	assert.NoError(t, s.Unit().Create(context.Background(), u))
+	assert.NoError(t, s.Units().Create(context.Background(), u))
 	assert.NotNil(t, u.ID)
-	unit, err := s.Unit().Find(context.Background(), u.ID)
+	unit, err := s.Units().Find(context.Background(), u.ID)
 	assert.NoError(t, err)
 	assert.NotNil(t, unit)
 	assert.Equal(t, u.ID, unit.ID)
@@ -40,11 +40,11 @@ func TestUnitRepository_Delete(t *testing.T) {
 
 	s := sqlstore.New(db)
 	u := models.TestUnit(t)
-	assert.NoError(t, s.Unit().Create(context.Background(), u))
+	assert.NoError(t, s.Units().Create(context.Background(), u))
 	assert.NotNil(t, u.ID)
 
-	assert.NoError(t, s.Unit().Delete(context.Background(), u.ID))
-	unit, err := s.Unit().Find(context.Background(), 100500)
+	assert.NoError(t, s.Units().Delete(context.Background(), u.ID))
+	unit, err := s.Units().Find(context.Background(), 100500)
 	assert.Error(t, err)
 	assert.Nil(t, unit)
 }
@@ -55,7 +55,7 @@ func TestUnitRepository_Update(t *testing.T) {
 
 	s := sqlstore.New(db)
 	u := models.TestUnit(t)
-	assert.NoError(t, s.Unit().Create(context.Background(), u))
+	assert.NoError(t, s.Units().Create(context.Background(), u))
 	assert.NotNil(t, u.ID)
 
 	newU := &models.Unit{
@@ -63,14 +63,14 @@ func TestUnitRepository_Update(t *testing.T) {
 		Address: "New Address",
 	}
 
-	assert.NoError(t, s.Unit().Update(context.Background(), u.ID, newU))
+	assert.NoError(t, s.Units().Update(context.Background(), u.ID, newU))
 	assert.Equal(t, "New Name", newU.Name)
 	assert.Equal(t, "New Address", newU.Address)
 
-	unit, err := s.Unit().Find(context.Background(), u.ID)
+	unit, err := s.Units().Find(context.Background(), u.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, "New Name", unit.Name)
 	assert.Equal(t, "New Address", unit.Address)
 
-	assert.Error(t, s.Unit().Update(context.Background(), 100500, newU))
+	assert.Error(t, s.Units().Update(context.Background(), 100500, newU))
 }

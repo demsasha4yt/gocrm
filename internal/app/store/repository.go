@@ -7,7 +7,7 @@ import (
 )
 
 // UserRepository interface
-type UserRepository interface {
+type UsersRepository interface {
 	Create(context.Context, *models.User) error
 	Find(context.Context, int) (*models.User, error)
 	FindByEmail(context.Context, string) (*models.User, error)
@@ -17,7 +17,7 @@ type UserRepository interface {
 }
 
 // UnitRepository interface
-type UnitRepository interface {
+type UnitsRepository interface {
 	Create(context.Context, *models.Unit) error
 	Find(context.Context, int) (*models.Unit, error)
 	Delete(context.Context, int) error

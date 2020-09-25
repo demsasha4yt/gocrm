@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/demsasha4yt/gocrm.git/internal/app/service"
 	"github.com/demsasha4yt/gocrm.git/internal/app/store"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -39,18 +40,20 @@ type server struct {
 	db           *sql.DB
 	store        store.Store
 	sessionStore sessions.Store
+	service      service.Interface
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
-func newServer(store store.Store, sessionStore sessions.Store) *server {
+func newServer(store store.Store, sessionStore sessions.Store, service service.Interface) *server {
 	s := &server{
 		logger:       logrus.New(),
 		router:       mux.NewRouter(),
 		store:        store,
 		sessionStore: sessionStore,
+		service:      service,
 	}
 
 	s.configureRouter(s.router, s.registerRouters())

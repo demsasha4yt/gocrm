@@ -18,7 +18,7 @@ func (s *server) handleSignIn() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-		u, err := s.store.User().FindByLogin(r.Context(), req.Login)
+		u, err := s.service.Users().FindByLogin(r.Context(), req.Login)
 		if err != nil || !u.ComparePassword(req.Password) {
 			s.error(w, r, http.StatusUnauthorized, errIncorectEmailOrPassword)
 			return

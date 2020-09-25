@@ -29,7 +29,7 @@ func (s *server) authMiddleware(next http.Handler) http.Handler {
 			s.error(w, r, http.StatusUnauthorized, errNotAuthorized)
 			return
 		}
-		u, err := s.store.User().Find(r.Context(), id.(int))
+		u, err := s.service.Users().Find(r.Context(), id.(int))
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, errNotAuthorized)
 			return

@@ -10,21 +10,13 @@ import (
 	"github.com/demsasha4yt/gocrm.git/internal/app/store"
 )
 
-// UserRepository struct
-type UserRepository struct {
+// UsersRepository struct
+type UsersRepository struct {
 	store *Store
 }
 
 // Create creates user
-func (r *UserRepository) Create(ctx context.Context, u *models.User) error {
-	if err := u.Validate(); err != nil {
-		return err
-	}
-
-	if err := u.BeforeCreate(); err != nil {
-		return err
-	}
-
+func (r *UsersRepository) Create(ctx context.Context, u *models.User) error {
 	return r.store.db.QueryRow(
 		ctx,
 		"INSERT INTO users (email, login, password, access_level) VALUES ($1, $2, $3, $4) RETURNING id",
@@ -36,7 +28,7 @@ func (r *UserRepository) Create(ctx context.Context, u *models.User) error {
 }
 
 // Find user
-func (r *UserRepository) Find(ctx context.Context, id int) (*models.User, error) {
+func (r *UsersRepository) Find(ctx context.Context, id int) (*models.User, error) {
 	u := &models.User{}
 
 	var units []byte
@@ -81,7 +73,7 @@ func (r *UserRepository) Find(ctx context.Context, id int) (*models.User, error)
 }
 
 // FindByEmail user by Email
-func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*models.User, error) {
+func (r *UsersRepository) FindByEmail(ctx context.Context, email string) (*models.User, error) {
 	u := &models.User{}
 
 	var units []byte
@@ -126,7 +118,7 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*models
 }
 
 // FindByLogin user by Login
-func (r *UserRepository) FindByLogin(ctx context.Context, login string) (*models.User, error) {
+func (r *UsersRepository) FindByLogin(ctx context.Context, login string) (*models.User, error) {
 	u := &models.User{}
 
 	var units []byte
@@ -170,7 +162,7 @@ func (r *UserRepository) FindByLogin(ctx context.Context, login string) (*models
 }
 
 // Delete deletes user
-func (r *UserRepository) Delete(ctx context.Context, id int) error {
+func (r *UsersRepository) Delete(ctx context.Context, id int) error {
 	_, err := r.store.db.Exec(ctx, "DELETE FROM users WHERE id=$1", id)
 	if err != nil {
 		return err
@@ -179,17 +171,11 @@ func (r *UserRepository) Delete(ctx context.Context, id int) error {
 }
 
 // Update user
-func (r *UserRepository) Update(ctx context.Context, id int, u *models.User) error {
-	u.EncryptedPassword = "a" // to avoid validate passoword field
-	if err := u.Validate(); err != nil {
-		return err
-	}
-
+func (r *UsersRepository) Update(ctx context.Context, id int, u *models.User) error {
 	userDetails, err := r.Find(ctx, id)
 	if err != nil {
 		return store.ErrRecordNotFound
 	}
-
 	if u.Login != "" {
 		userDetails.Login = u.Login
 	}
