@@ -80,6 +80,7 @@ type OptionsTypesRepository interface {
 type OptionsValuesRepository interface {
 	Create(context.Context, *models.OptionValue) error
 	Find(context.Context, int) (*models.OptionValue, error)
+	FindAll(context.Context, int, int) ([]*models.OptionValue, error)
 	Delete(context.Context, int) error
 	Update(context.Context, int, *models.OptionValue) error
 }
