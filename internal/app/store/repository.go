@@ -6,7 +6,7 @@ import (
 	"github.com/demsasha4yt/gocrm.git/internal/app/models"
 )
 
-// UserRepository interface
+// UsersRepository interface
 type UsersRepository interface {
 	Create(context.Context, *models.User) error
 	Find(context.Context, int) (*models.User, error)
@@ -16,7 +16,7 @@ type UsersRepository interface {
 	Update(context.Context, int, *models.User) error
 }
 
-// UnitRepository interface
+// UnitsRepository interface
 type UnitsRepository interface {
 	Create(context.Context, *models.Unit) error
 	Find(context.Context, int) (*models.Unit, error)
@@ -70,6 +70,7 @@ type OptionsSoftsRepository interface {
 type OptionsTypesRepository interface {
 	Create(context.Context, *models.OptionType) error
 	Find(context.Context, int) (*models.OptionType, error)
+	FindAll(context.Context, int, int) ([]*models.OptionType, error)
 	Delete(context.Context, int) error
 	Update(context.Context, int, *models.OptionType) error
 }
