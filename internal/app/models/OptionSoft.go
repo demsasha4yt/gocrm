@@ -6,6 +6,7 @@ type OptionSoft struct {
 	Name         string        `json:"name,omitempty"`
 	Image        string        `json:"image,omitempty"`
 	IsSoft       bool          `json:"is_soft"`
+	SoftCategory *SoftCategory `json:"soft_category,omitempty"`
 	OptionValue  *OptionValue  `json:"option_value,omitempty"`
 	Manufacturer *Manufacturer `json:"manufacturer,omitempty"`
 }

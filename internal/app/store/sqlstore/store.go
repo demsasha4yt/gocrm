@@ -7,19 +7,20 @@ import (
 
 // Store implements Store interface
 type Store struct {
-	db                      *pgxpool.Pool
-	categoriesRepository    *CategoriesRepository
-	customersRepository     *CustomersRepository
-	manufacturersRepository *ManufacturersRepository
-	optionsRepository       *OptionsRepository
-	optionsSoftsRepository  *OptionsSoftsRepository
-	optionsTypesRepository  *OptionsTypesRepository
-	optionsValuesRepository *OptionsValuesRepository
-	ordersRepository        *OrdersRepository
-	productsRepository      *ProductsRepository
-	unitsRepository         *UnitsRepository
-	usersRepository         *UsersRepository
-	variationsRepository    *VariationsRepository
+	db                       *pgxpool.Pool
+	categoriesRepository     *CategoriesRepository
+	customersRepository      *CustomersRepository
+	manufacturersRepository  *ManufacturersRepository
+	optionsRepository        *OptionsRepository
+	optionsSoftsRepository   *OptionsSoftsRepository
+	optionsTypesRepository   *OptionsTypesRepository
+	optionsValuesRepository  *OptionsValuesRepository
+	ordersRepository         *OrdersRepository
+	productsRepository       *ProductsRepository
+	softCategoriesRepository *SoftCategoriesRepository
+	unitsRepository          *UnitsRepository
+	usersRepository          *UsersRepository
+	variationsRepository     *VariationsRepository
 }
 
 // New creates new Store
@@ -133,7 +134,7 @@ func (s *Store) Orders() store.OrdersRepository {
 	return s.ordersRepository
 }
 
-// Products returns producrsRepository
+// Products returns productsRepository
 func (s *Store) Products() store.ProductsRepository {
 	if s.productsRepository != nil {
 		return s.productsRepository
@@ -144,6 +145,19 @@ func (s *Store) Products() store.ProductsRepository {
 	}
 
 	return s.productsRepository
+}
+
+// SoftCategories returns softCategoriesRepository
+func (s *Store) SoftCategories() store.SoftCategoriesRepository {
+	if s.softCategoriesRepository != nil {
+		return s.softCategoriesRepository
+	}
+
+	s.softCategoriesRepository = &SoftCategoriesRepository{
+		store: s,
+	}
+
+	return s.softCategoriesRepository
 }
 
 // Units returns unitRepository

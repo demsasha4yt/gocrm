@@ -31,12 +31,21 @@ CREATE TABLE options_values (
 				ON DELETE CASCADE
 );
 
+CREATE TABLE softs_categories (
+	id BIGSERIAL PRIMARY KEY,
+	name VARCHAR NOT NULL,
+	value INT NOT NULL,
+	CONSTRAINT uniq_value 
+		UNIQUE(value)
+);
+
 CREATE TABLE options_softs (
 	id BIGSERIAL PRIMARY KEY,
 	name VARCHAR,
 	image VARCHAR,
 	options_value_id BIGINT,
 	manufacturer_id BIGINT,
+	soft_category_id BIGINT,
 	CONSTRAINT fk_options_values
 		FOREIGN KEY(options_value_id)
 			REFERENCES options_values(id)
@@ -44,5 +53,9 @@ CREATE TABLE options_softs (
 	CONSTRAINT fk_manufacturers
 		FOREIGN KEY(manufacturer_id)
 			REFERENCES manufacturers(id)
+				ON DELETE CASCADE,
+	CONSTRAINT fk_softs_categories
+		FOREIGN KEY(soft_category_id)
+			REFERENCES softs_categories(id)
 				ON DELETE CASCADE
 );

@@ -19,10 +19,6 @@ func TestDB(t *testing.T, databaseURL string) (*pgxpool.Pool, func(...string)) {
 		t.Fatal(err)
 	}
 
-	// if err := db.Ping(); err != nil {
-	// 	t.Fatal(err)
-	// }
-
 	return db, func(tables ...string) {
 		if len(tables) > 0 {
 			db.Exec(context.Background(), fmt.Sprintf("TRUNCATE %s CASCADE", strings.Join(tables, ", ")))

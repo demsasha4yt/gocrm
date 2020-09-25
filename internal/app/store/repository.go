@@ -100,6 +100,15 @@ type ProductsRepository interface {
 	Update(context.Context, int, *models.Product) error
 }
 
+// SoftCategoriesRepository interface
+type SoftCategoriesRepository interface {
+	Create(context.Context, *models.SoftCategory) error
+	Find(context.Context, int) (*models.SoftCategory, error)
+	FindAll(context.Context, int, int) ([]*models.SoftCategory, error)
+	Delete(context.Context, int) error
+	Update(context.Context, int, *models.SoftCategory) error
+}
+
 // VariationsRepository interface
 type VariationsRepository interface {
 	Create(context.Context, *models.Variation) error

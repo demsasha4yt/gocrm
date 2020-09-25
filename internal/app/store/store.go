@@ -10,6 +10,8 @@ type Store interface {
 	OptionsTypes() OptionsTypesRepository
 	OptionsValues() OptionsValuesRepository
 	Orders() OrdersRepository
+	Products() ProductsRepository
+	SoftCategories() SoftCategoriesRepository
 	Units() UnitsRepository
 	Users() UsersRepository
 	Variations() VariationsRepository
