@@ -54,6 +54,7 @@ type ManufacturersRepository interface {
 type OptionsRepository interface {
 	Create(context.Context, *models.Option) error
 	Find(context.Context, int) (*models.Option, error)
+	FindAll(context.Context, int, int) ([]*models.Option, error)
 	Delete(context.Context, int) error
 	Update(context.Context, int, *models.Option) error
 }

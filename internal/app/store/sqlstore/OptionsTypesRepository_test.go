@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func initStore(t *testing.T) (store.Store, func(...string)) {
+func initOptionsTypes(t *testing.T) (store.Store, func(...string)) {
 	t.Helper()
 	db, teardown := sqlstore.TestDB(t, databaseURL)
 
@@ -20,7 +20,7 @@ func initStore(t *testing.T) (store.Store, func(...string)) {
 }
 
 func TestOptionsTypesRepository_Create(t *testing.T) {
-	s, teardown := initStore(t)
+	s, teardown := initOptionsTypes(t)
 	defer teardown("options_types")
 
 	u := &models.OptionType{
@@ -38,7 +38,7 @@ func TestOptionsTypesRepository_Create(t *testing.T) {
 }
 
 func TestOptionsTypesRepository_Find(t *testing.T) {
-	s, teardown := initStore(t)
+	s, teardown := initOptionsTypes(t)
 	defer teardown("options_types")
 
 	u := &models.OptionType{
@@ -57,7 +57,7 @@ func TestOptionsTypesRepository_Find(t *testing.T) {
 }
 
 func TestOptionsTypesRepository_FindAll(t *testing.T) {
-	s, teardown := initStore(t)
+	s, teardown := initOptionsTypes(t)
 	defer teardown("options_types")
 
 	a, err := s.OptionsTypes().FindAll(context.Background(), 0, 25)
@@ -82,7 +82,7 @@ func TestOptionsTypesRepository_FindAll(t *testing.T) {
 }
 
 func TestOptionsTypesRepository_Delete(t *testing.T) {
-	s, teardown := initStore(t)
+	s, teardown := initOptionsTypes(t)
 	defer teardown("options_types")
 
 	u := &models.OptionType{
@@ -104,7 +104,7 @@ func TestOptionsTypesRepository_Delete(t *testing.T) {
 }
 
 func TestOptionsTypesRepository_Update(t *testing.T) {
-	s, teardown := initStore(t)
+	s, teardown := initOptionsTypes(t)
 	defer teardown("options_types")
 
 	u := &models.OptionType{
