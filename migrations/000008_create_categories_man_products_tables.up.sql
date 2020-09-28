@@ -51,11 +51,6 @@ CREATE TABLE products (
 	id BIGSERIAL PRIMARY KEY,
 	name VARCHAR,
 	manufacturer_id BIGINT,
-	category_id BIGINT,
-	CONSTRAINT fk_categories
-			FOREIGN KEY(category_id)
-					REFERENCES categories(id)
-						ON DELETE CASCADE,
 	CONSTRAINT fk_manufacturers
 		FOREIGN KEY(manufacturer_id)
 				REFERENCES manufacturers(id)

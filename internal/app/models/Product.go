@@ -4,12 +4,15 @@ import "encoding/json"
 
 // Product ...
 type Product struct {
-	ID            int            `json:"id"`
-	Name          string         `json:"name,omitempty"`
-	Category      []*Category    `json:"categories,omitemty"`
-	Options       []*Option      `json:"options,omitempty"`
-	OptionsValues []*OptionValue `json:"options_values,omitempty"`
-	Variations    []*Variation   `json:"variations,omitempty"`
+	ID             int            `json:"id"`
+	Name           string         `json:"name,omitempty"`
+	ManufacturerID int            `json:"manufacturer_id,omitempty"`
+	Manufacturer   *Manufacturer  `json:"manufacturer,omitempty"`
+	CategoryID     int            `json:"category_id,omitempty"`
+	Categories     []*Category    `json:"categories,omitemty"`
+	Options        []*Option      `json:"options,omitempty"`
+	OptionsValues  []*OptionValue `json:"options_values,omitempty"`
+	Variations     []*Variation   `json:"variations,omitempty"`
 }
 
 // Validate ...
