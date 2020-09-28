@@ -16,7 +16,7 @@ type OptionsValuesRepository struct {
 func (r *OptionsValuesRepository) Create(ctx context.Context, u *models.OptionValue) error {
 	return r.store.db.QueryRow(
 		ctx,
-		`INSERT INTO options_values(value, image, option_id, option_type_id)
+		`INSERT INTO options_values(value, image, option_id, options_type_id)
 		VALUES ($1, $2, $3, $4) RETURNING id`,
 		u.Value,
 		u.Image,
@@ -43,7 +43,8 @@ func (r *OptionsValuesRepository) Find(ctx context.Context, id int) (*models.Opt
 		JOIN options o ON o.id = ov.id
 		LEFT JOIN options_softs os ON os.options_value_id = ov.id
 		WHERE ov.id = $1
-		GROUP BY ov.id, o.id, ot.id`,
+		GROUP BY ov.id, o.id, ot.id
+		LIMIT 1`,
 		id,
 	).Scan(
 		&u.ID,
@@ -56,6 +57,20 @@ func (r *OptionsValuesRepository) Find(ctx context.Context, id int) (*models.Opt
 		&softs,
 	); err != nil {
 		return nil, err
+	}
+	optionEntity, err := models.NewOptionFromByte(option)
+	if err == nil && optionEntity != nil {
+		u.Option = optionEntity
+	}
+
+	optionTypeEntity, err := models.NewOptionTypeFromByte(optionType)
+	if err == nil && optionTypeEntity != nil {
+		u.OptionType = optionTypeEntity
+	}
+
+	softsEntities, err := models.NewOptionSoftSliceFromByte(softs)
+	if err == nil && softsEntities != nil {
+		u.Softs = softsEntities
 	}
 	return u, nil
 }
@@ -86,7 +101,7 @@ func (r *OptionsValuesRepository) FindAll(ctx context.Context, offset, limit int
 		var optionType []byte
 		var softs []byte
 		u := &models.OptionValue{}
-		if err := rows.Scan(&u.ID,
+		if err := rows.Scan(
 			&u.ID,
 			&u.Value,
 			&u.Image,
@@ -97,6 +112,20 @@ func (r *OptionsValuesRepository) FindAll(ctx context.Context, offset, limit int
 			&softs,
 		); err != nil {
 			return nil, err
+		}
+		optionEntity, err := models.NewOptionFromByte(option)
+		if err == nil && optionEntity != nil {
+			u.Option = optionEntity
+		}
+
+		optionTypeEntity, err := models.NewOptionTypeFromByte(optionType)
+		if err == nil && optionTypeEntity != nil {
+			u.OptionType = optionTypeEntity
+		}
+
+		softsEntities, err := models.NewOptionSoftSliceFromByte(softs)
+		if err == nil && softsEntities != nil {
+			u.Softs = softsEntities
 		}
 		m = append(m, u)
 	}

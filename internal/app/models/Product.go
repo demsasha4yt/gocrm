@@ -1,5 +1,7 @@
 package models
 
+import "encoding/json"
+
 // Product ...
 type Product struct {
 	ID            int            `json:"id"`
@@ -13,4 +15,28 @@ type Product struct {
 // Validate ...
 func (s *Product) Validate() error {
 	return nil
+}
+
+// NewProductFromByte creates struct from byte slice
+func NewProductFromByte(b []byte) (*Product, error) {
+	if b == nil {
+		return nil, ErrByteSliceNil
+	}
+	u := &Product{}
+	if err := json.Unmarshal(b, &u); err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+// NewProductSliceFromByte creates struct from byte slice
+func NewProductSliceFromByte(b []byte) ([]*Product, error) {
+	if b == nil {
+		return nil, ErrByteSliceNil
+	}
+	var u []*Product = make([]*Product, 0)
+	if err := json.Unmarshal(b, &u); err != nil {
+		return nil, err
+	}
+	return u, nil
 }

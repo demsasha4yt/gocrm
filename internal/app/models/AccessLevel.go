@@ -1,5 +1,7 @@
 package models
 
+import "encoding/json"
+
 // AccessLevel ...
 type AccessLevel struct {
 	ID                 int    `json:"id"`
@@ -45,4 +47,28 @@ type AccessLevel struct {
 // Validate ...
 func (s *AccessLevel) Validate() error {
 	return nil
+}
+
+// NewAccessLevelFromByte creates struct from byte slice
+func NewAccessLevelFromByte(b []byte) (*AccessLevel, error) {
+	if b == nil {
+		return nil, ErrByteSliceNil
+	}
+	u := &AccessLevel{}
+	if err := json.Unmarshal(b, &u); err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+// NewAccessLevelSliceFromByte creates struct from byte slice
+func NewAccessLevelSliceFromByte(b []byte) ([]*AccessLevel, error) {
+	if b == nil {
+		return nil, ErrByteSliceNil
+	}
+	var u []*AccessLevel = make([]*AccessLevel, 0)
+	if err := json.Unmarshal(b, &u); err != nil {
+		return nil, err
+	}
+	return u, nil
 }

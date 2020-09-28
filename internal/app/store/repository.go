@@ -63,6 +63,7 @@ type OptionsRepository interface {
 type OptionsSoftsRepository interface {
 	Create(context.Context, *models.OptionSoft) error
 	Find(context.Context, int) (*models.OptionSoft, error)
+	FindAll(context.Context, int, int) ([]*models.OptionSoft, error)
 	Delete(context.Context, int) error
 	Update(context.Context, int, *models.OptionSoft) error
 }

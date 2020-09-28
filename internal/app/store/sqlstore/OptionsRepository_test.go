@@ -18,7 +18,7 @@ func initOptions(t *testing.T) (store.Store, func(...string), int) {
 	s := sqlstore.New(db)
 	u := &models.OptionType{
 		Name:   "Hello",
-		IsSoft: null.NewBool(false, true),
+		IsSoft: null.NewBool(true, true),
 	}
 	s.OptionsTypes().Create(context.Background(), u)
 	return s, teardown, u.ID

@@ -1,6 +1,10 @@
 package models
 
-import validation "github.com/go-ozzo/ozzo-validation"
+import (
+	"encoding/json"
+
+	validation "github.com/go-ozzo/ozzo-validation"
+)
 
 // Unit ...
 type Unit struct {
@@ -20,4 +24,28 @@ func (u *Unit) Validate() error {
 		validation.Field(&u.Name, validation.Required),
 		validation.Field(&u.Address, validation.Required),
 	)
+}
+
+// NewUnitFromByte creates struct from byte slice
+func NewUnitFromByte(b []byte) (*Unit, error) {
+	if b == nil {
+		return nil, ErrByteSliceNil
+	}
+	u := &Unit{}
+	if err := json.Unmarshal(b, &u); err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+// NewUnitSliceFromByte creates struct from byte slice
+func NewUnitSliceFromByte(b []byte) ([]*Unit, error) {
+	if b == nil {
+		return nil, ErrByteSliceNil
+	}
+	var u []*Unit = make([]*Unit, 0)
+	if err := json.Unmarshal(b, &u); err != nil {
+		return nil, err
+	}
+	return u, nil
 }

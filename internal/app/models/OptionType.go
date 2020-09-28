@@ -1,6 +1,10 @@
 package models
 
-import "github.com/guregu/null"
+import (
+	"encoding/json"
+
+	"github.com/guregu/null"
+)
 
 // OptionType ...
 type OptionType struct {
@@ -12,4 +16,25 @@ type OptionType struct {
 // Validate ...
 func (s *OptionType) Validate() error {
 	return nil
+}
+
+// NewOptionTypeFromByte creates struct from byte slice
+func NewOptionTypeFromByte(b []byte) (*OptionType, error) {
+	if b == nil {
+		return nil, ErrByteSliceNil
+	}
+	u := &OptionType{}
+	if err := json.Unmarshal(b, &u); err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+// NewOptionTypeSliceFromByte creates struct from byte slice
+func NewOptionTypeSliceFromByte(b []byte) ([]*OptionType, error) {
+	var u []*OptionType = make([]*OptionType, 0)
+	if err := json.Unmarshal(b, &u); err != nil {
+		return nil, err
+	}
+	return u, nil
 }

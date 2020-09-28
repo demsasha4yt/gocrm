@@ -3,6 +3,7 @@ package models
 import (
 	"crypto/sha512"
 	"encoding/base64"
+	"encoding/json"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
@@ -46,6 +47,30 @@ func (u *User) Validate() error {
 		validation.Field(&u.Login, validation.Required),
 		validation.Field(&u.Password, validation.By(requiredIf(u.EncryptedPassword == "")), validation.Length(6, 100)),
 	)
+}
+
+// NewUserFromByte creates struct from byte slice
+func NewUserFromByte(b []byte) (*User, error) {
+	if b == nil {
+		return nil, ErrByteSliceNil
+	}
+	u := &User{}
+	if err := json.Unmarshal(b, &u); err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+// NewUserSliceFromByte creates struct from byte slice
+func NewUserSliceFromByte(b []byte) ([]*User, error) {
+	if b == nil {
+		return nil, ErrByteSliceNil
+	}
+	var u []*User = make([]*User, 0)
+	if err := json.Unmarshal(b, &u); err != nil {
+		return nil, err
+	}
+	return u, nil
 }
 
 // Sanitize deletes all private data before response
