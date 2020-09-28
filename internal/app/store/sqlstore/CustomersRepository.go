@@ -21,6 +21,11 @@ func (r *CustomersRepository) Find(ctx context.Context, id int) (*models.Custome
 	return nil, nil
 }
 
+// FindAll ...
+func (r *CustomersRepository) FindAll(ctx context.Context, offset, limit int) ([]*models.Customer, error) {
+	return nil, nil
+}
+
 // Delete ...
 func (r *CustomersRepository) Delete(ctx context.Context, id int) error {
 	return nil

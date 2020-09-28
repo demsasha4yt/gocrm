@@ -21,6 +21,11 @@ func (r *VariationsRepository) Find(ctx context.Context, id int) (*models.Variat
 	return nil, nil
 }
 
+// FindAll ...
+func (r *VariationsRepository) FindAll(ctx context.Context, offset, limit int) ([]*models.Variation, error) {
+	return nil, nil
+}
+
 // Delete ...
 func (r *VariationsRepository) Delete(ctx context.Context, id int) error {
 	return nil

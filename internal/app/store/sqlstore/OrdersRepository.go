@@ -21,6 +21,11 @@ func (r *OrdersRepository) Find(ctx context.Context, id int) (*models.Order, err
 	return nil, nil
 }
 
+// FindAll ...
+func (r *OrdersRepository) FindAll(ctx context.Context, offset, limit int) ([]*models.Order, error) {
+	return nil, nil
+}
+
 // Delete ...
 func (r *OrdersRepository) Delete(ctx context.Context, id int) error {
 	return nil

@@ -41,6 +41,11 @@ func (r *UnitsRepository) Find(ctx context.Context, id int) (*models.Unit, error
 	return u, nil
 }
 
+// FindAll ...
+func (r *UnitsRepository) FindAll(ctx context.Context, offset, limit int) ([]*models.Unit, error) {
+	return nil, nil
+}
+
 // Delete ..
 func (r *UnitsRepository) Delete(ctx context.Context, id int) error {
 	_, err := r.store.db.Exec(ctx, "DELETE FROM units WHERE id=$1", id)

@@ -72,6 +72,11 @@ func (r *UsersRepository) Find(ctx context.Context, id int) (*models.User, error
 	return u, nil
 }
 
+// FindAll ...
+func (r *UsersRepository) FindAll(ctx context.Context, offset, limit int) ([]*models.User, error) {
+	return nil, nil
+}
+
 // FindByEmail user by Email
 func (r *UsersRepository) FindByEmail(ctx context.Context, email string) (*models.User, error) {
 	u := &models.User{}

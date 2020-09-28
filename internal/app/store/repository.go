@@ -10,6 +10,7 @@ import (
 type UsersRepository interface {
 	Create(context.Context, *models.User) error
 	Find(context.Context, int) (*models.User, error)
+	FindAll(context.Context, int, int) ([]*models.User, error)
 	FindByEmail(context.Context, string) (*models.User, error)
 	FindByLogin(context.Context, string) (*models.User, error)
 	Delete(context.Context, int) error
@@ -20,6 +21,7 @@ type UsersRepository interface {
 type UnitsRepository interface {
 	Create(context.Context, *models.Unit) error
 	Find(context.Context, int) (*models.Unit, error)
+	FindAll(context.Context, int, int) ([]*models.Unit, error)
 	Delete(context.Context, int) error
 	Update(context.Context, int, *models.Unit) error
 }
@@ -37,6 +39,7 @@ type CategoriesRepository interface {
 type CustomersRepository interface {
 	Create(context.Context, *models.Customer) error
 	Find(context.Context, int) (*models.Customer, error)
+	FindAll(context.Context, int, int) ([]*models.Customer, error)
 	Delete(context.Context, int) error
 	Update(context.Context, int, *models.Customer) error
 }
@@ -90,6 +93,7 @@ type OptionsValuesRepository interface {
 type OrdersRepository interface {
 	Create(context.Context, *models.Order) error
 	Find(context.Context, int) (*models.Order, error)
+	FindAll(context.Context, int, int) ([]*models.Order, error)
 	Delete(context.Context, int) error
 	Update(context.Context, int, *models.Order) error
 }
@@ -98,6 +102,7 @@ type OrdersRepository interface {
 type ProductsRepository interface {
 	Create(context.Context, *models.Product) error
 	Find(context.Context, int) (*models.Product, error)
+	FindAll(context.Context, int, int) ([]*models.Product, error)
 	Delete(context.Context, int) error
 	Update(context.Context, int, *models.Product) error
 }
@@ -115,6 +120,7 @@ type SoftCategoriesRepository interface {
 type VariationsRepository interface {
 	Create(context.Context, *models.Variation) error
 	Find(context.Context, int) (*models.Variation, error)
+	FindAll(context.Context, int, int) ([]*models.Variation, error)
 	Delete(context.Context, int) error
 	Update(context.Context, int, *models.Variation) error
 }
