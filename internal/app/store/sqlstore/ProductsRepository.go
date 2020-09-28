@@ -37,6 +37,49 @@ func (r *ProductsRepository) Create(ctx context.Context, u *models.Product) erro
 			return err
 		}
 	}
+	variationsIDs := make([]int, 0)
+	for _, variation := range u.Variations {
+		var variationID int
+		err := tx.QueryRow(
+			ctx,
+			"INSERT INTO variations (name, description, price, product_id) VALUES ($1, $2, $3, $4) RETURNING id",
+			variation.Name,
+			variation.Description,
+			variation.Price,
+			variation.ProductID,
+		).Scan(
+			&variationID,
+		)
+		if err != nil {
+			return err
+		}
+		if _, err := tx.Exec(
+			ctx,
+			"INSERT INTO products_variations (product_id, variation_id) VALUES ($1, $2)",
+			u.ID, variationID,
+		); err != nil {
+			return err
+		}
+		variationsIDs = append(variationsIDs, variationID)
+	}
+	for _, value := range u.OptionsValues {
+		if _, err := tx.Exec(
+			ctx,
+			"INSERT INTO product_options_values (product_id, options_value_id) VALUES ($1, $2)",
+			u.ID, value.ID,
+		); err != nil {
+			return err
+		}
+		for _, variationID := range variationsIDs {
+			if _, err := tx.Exec(
+				ctx,
+				"INSERT INTO variations_options_values (variation_id, options_value_id) VALUES ($1, $2)",
+				variationID, value.ID,
+			); err != nil {
+				return err
+			}
+		}
+	}
 	return tx.Commit(ctx)
 }
 

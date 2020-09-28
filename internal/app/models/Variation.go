@@ -7,6 +7,8 @@ type Variation struct {
 	ID            int            `json:"id"`
 	Name          string         `json:"name,omitempty"`
 	Description   string         `json:"description,omitemty"`
+	Price         int            `json:"price,omitempty"`
+	ProductID     int            `json:"product_id,omitempty"`
 	Options       []*Option      `json:"options,omitempty"`
 	OptionsValues []*OptionValue `json:"options_values,omitempty"`
 	Product       *Product       `json:"product,omitempty"`
